@@ -1,2 +1,2 @@
 # sermonz
-Sermon library management system
+Sermon library management system - Wordpress plugin
