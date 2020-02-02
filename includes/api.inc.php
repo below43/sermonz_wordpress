@@ -16,8 +16,11 @@ class SermonzApi
     public $route;
     public $argument;
 
-    public $content = "-";
+    public $content = "";
     public $title = "Sermon Library";
+    public $show_back = false;
+    public $active_search = null;
+    public $filter_name = "";
 
     public function __construct($hostname)
     {
@@ -30,7 +33,7 @@ class SermonzApi
     {
         $this->route = get_query_var('sermonz_route');
         $this->argument = get_query_var('sermonz_argument');
-        $this->content .= "route: ".$this->route."; argument: ".$this->argument;
+        $this->content .= "<br/><br/>route: ".$this->route."; argument: ".$this->argument;
         switch ($this->route) {
             case "search":
                 // <li>search (optional): keyword search</li>
@@ -40,33 +43,54 @@ class SermonzApi
 				// <li>order_direction (optional): asc, desc</li> 
                 break;
             case "filter":
+                $this->title = "Apply Filter";
                 switch ($this->argument)
                 {
                     case "series":
                         $this->load_series();
+                        $this->filter_name = "Series";
+                        break;
+                    case "speakers":
+                        $this->load_speakers();
+                        $this->filter_name = "Speaker";
+                        break;
+                    case "books":
+                        $this->load_books();
+                        $this->filter_name = "Book of Bible";
                         break;
                 }
                 break;
-            case "series":
-				if ($this->argument)
-                {
-                    $this->load_series_item($this->argument);
-                    break;
-                }
-                break;
-            case "speakers":
-                break;
-            case "books":
+            case "sermon":
                 break;
         }
 
+        $search = null;
+        if (isset($_SESSION['sermonz_active_search']))
+        {
+            $search = unserialize($_SESSION['sermonz_active_search']);
+        }
+        
+        if (!$search)
+        {
+            $search = new SermonzSearch();
+        }
+
+    }
+
+    private function load_books()
+    {
+
+    }
+
+    private function load_speakers()
+    {
 
     }
 
     private function load_series()
     {
-        $this->route = get_query_var('sermonz_route');
-        $this->argument = get_query_var('sermonz_argument');
+        // $this->route = get_query_var('sermonz_route');
+        // $this->argument = get_query_var('sermonz_argument');
         $params = [
             order_by => get_query_var('order_by'),
             order_direction => get_query_var('order_direction')
@@ -77,8 +101,7 @@ class SermonzApi
         $this->content .= $result;
         $series = json_decode($result);
         if (!$series || !count($series)) {
-            $this->content = "Error: cannot load series";
-            $this->title = "Series error";
+            $this->content .= sprintf('<p class="error">Error: cannot load series</p>');
             return;
         }
 
@@ -95,8 +118,7 @@ class SermonzApi
         $result = $this->call_api($url);
         $series = json_decode($result);
         if (!$series) {
-            $this->content = "Error: cannot load series with id, ".(int)$id;
-            $this->title = "Series error";
+            $this->content .= sprintf('<p class="error">Error: cannot load series with id, %s</p>', (int)$id);
             return;
         }
 
@@ -127,4 +149,16 @@ class SermonzApi
         return $result;
     }
 
+}
+
+class SermonzSearch
+{
+    public function __construct()
+    {
+
+    }
+    public $keywords="";
+    public $series_id="";
+    public $speaker="";
+    public $book="";
 }
