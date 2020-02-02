@@ -26,3 +26,8 @@ function sermonz_enqueue_scripts() {
         //array( 'jquery' ) 
     );
 }
+
+function sermonz_load_dashicons(){
+    wp_enqueue_style('dashicons');
+}
+add_action('wp_enqueue_scripts', 'sermonz_load_dashicons');

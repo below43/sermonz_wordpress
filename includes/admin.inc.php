@@ -97,7 +97,7 @@ function sermonz_options_page_html()
 			<th scope="row">Sermo.nz API URL</th>
 			<td>
 				<input type="text" name="sermonz_api_url" style="width: 400px" value="<?php echo esc_attr( get_option('sermonz_api_url') ); ?>" placeholder="https://yoursite.sermo.nz/api/" /><br/>
-				<br/><i>Format: https://yoursite.sermo.nz/api/</i>.
+				<br/><i>Format: https://yoursite.sermo.nz/api/v1/</i>.
 			</td>
         </tr>
 
@@ -121,7 +121,9 @@ function sermonz_options_page_html()
         <tr valign="top">
 			<th scope="row">Custom CSS (optional)</th>
 			<td>
-				<textarea style="width: 400px" name="sermonz_css" ><?php echo esc_html( get_option('sermonz_css') ); ?></textarea>
+				<p>Put your theme overrides here:</p>
+				<textarea style="width: 400px; height: 200px;" cols="200" rows="10" name="sermonz_css" ><?php echo esc_html( get_option('sermonz_css') ); ?></textarea>
+				
 			</td>
         </tr>
     </table>

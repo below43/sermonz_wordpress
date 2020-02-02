@@ -39,6 +39,13 @@ function sermonz_insert_rewrite_rules( $rules ) {
 function sermonz_insert_query_vars( $vars ) 
 {
 	array_push($vars, 'sermonz_route');
-	array_push($vars , 'sermonz_argument');	
+	array_push($vars, 'sermonz_argument');
+	array_push($vars, 'order_by');
+	array_push($vars, 'order_direction');
+	array_push($vars, 'series_id');
+	array_push($vars, 'series_name');
+	array_push($vars, 'speaker');
+	array_push($vars, 'book');
+	array_push($vars, 'keywords');
     return $vars;
 }

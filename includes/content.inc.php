@@ -28,7 +28,8 @@ function sermonz_filter_head_title($title)
 {
     $sep = apply_filters( 'document_title_separator', '-' );
     if (get_the_ID() == get_option('sermonz_page')) {
-		array_unshift($title, "Custom Title");
+        global $sermonz_api;
+		array_unshift($title, $sermonz_api->title);
     	return array(implode(" $sep ", $title));
 	}
 	return $title;
@@ -46,18 +47,32 @@ function sermonz_filter_h1_title( $title, $id )
 function sermonz_filter_content($content) 
 {
     global $sermonz_api;
+    $sermonz_content = '<div class="sermonz">';
 	if (get_the_ID() == get_option('sermonz_page')) 
 	{
-        $base_url = sermonz_get_page_uri();
+        $base_url = $sermonz_api->build_url();
         
         if ($sermonz_api->route=="filter")
         {
+            $sermonz_content .= '<div class="sermonz_filter_inner_head_wrap">';
             $sermonz_content .= sprintf(
-                '<div class="sermonz_filter_inner_head"><h2 class="entry_subtitle">Filter By %s</h2><a href="%s">%s</a></div>',
-                $sermonz_api->filter_name,
+                '<div class="sermonz_filter_inner_head"><a href="%s">%s</a></div>',
+                // $sermonz_api->filter_name,
                 $base_url,
-                '&lt; Go Back'
+                '<span class="dashicons-before dashicons-arrow-left-alt2"></span> Go Back'
             );
+
+            $clear_url = $sermonz_api->clear_filter_and_build_url();
+            if ($clear_url)
+            {
+                $sermonz_content .= sprintf(
+                    '<div class="sermonz_filter_inner_head right"><a href="%s">%s</a></div>',
+                    // $sermonz_api->filter_name,
+                    $clear_url,
+                    '<span class="dashicons-before dashicons-no"></span> Clear Filter'
+                );
+            }
+            $sermonz_content .= '</div>';
         }
         else 
         {
@@ -76,18 +91,19 @@ function sermonz_filter_content($content)
         } 
 
         $sermonz_content.=$sermonz_api->content;
-
         $sermonz_content .= '<style src="/wp-includes/plugins/sermonz/sermonz.css"></style>';
         $sermonz_content .= sprintf('<style>%s</style>', esc_html( get_option('sermonz_css') ));
 
-		return $sermonz_content.$content;
-	}
-	return $content;
+		
+    }
+    $sermonz_content .= "</div>";
+    return $sermonz_content.$content;
 }
 
 function get_filter_content()
 {
-    $filter_html = "";
+    global $sermonz_api;
+    $filter_html = '';
 
     $filters = array(
         "/filter/series"=>"Series",
@@ -97,41 +113,54 @@ function get_filter_content()
 
     foreach ($filters as $filter=>$label)
     {
-        $classes = "filters ";
-        
+        $classes = "sermonz_filter ";
+        $active = false;
+        $active_count = 0;
         switch($label) {
             case "Series":
-                if (isset($sermonz_api->active_search->series_id))
+                if (isset($sermonz_api->active_search->series_id)&&isset($sermonz_api->active_search->series_name)&&$sermonz_api->active_search->series_name)
                 {
                     $classes.="active ";
+                    $active = true;
+                    $filter_val = $sermonz_api->active_search->series_name;
                 }
                 break;
             case "Book":
-                if (isset($sermonz_api->active_search->book))
+                if (isset($sermonz_api->active_search->book)&&$sermonz_api->active_search->book)
                 {
                     $classes.="active ";
+                    $active = true;
+                    $filter_val = $sermonz_api->active_search->book;
                 }
                 break;
             case "Speaker":
-                if (isset($sermonz_api->active_search->speaker))
+                if (isset($sermonz_api->active_search->speaker)&&$sermonz_api->active_search->speaker)
                 {
                     $classes.="active ";
+                    $active = true;
+                    $filter_val = $sermonz_api->active_search->speaker;
                 }
                 break;
         }
+        if ($active) $active_count++;
         $base_url = sermonz_get_page_uri();
         $filter_html .= sprintf(
             '<a href="%s" id="%s" class="%s">%s</a>',
             esc_attr_x($base_url.$filter, "sermonz href for filter"),
             strtolower($label),
             $classes,
-            esc_attr_x($label, "sermonz label for filter")
+            ($active)?esc_html($label).": ".esc_html($filter_val):"Filter by ".esc_html($label)
         );
     }
     return sprintf(
-        '<div class="sermonz_search_filters_wrap"><label>%s</label><div class="sermon_search_filters_wrap_a">%s</div><a class="sermonz_show_search"><span class="screen-reader-text">Show Search</a></a></div>',
-        esc_attr_x('Filter By:', 'sermon search filters'),
-        $filter_html
+        '<div class="sermonz_search_filters_wrap">%s<div class="sermon_search_filters_wrap_a">%s</div>%s</div>',
+        '<a class="sermonz_show_search"><span class="dashicons-before dashicons-search"></span><span class="screen-reader-text">Show Search</a></a>',
+        $filter_html,
+        $active_count?'<a class="sermonz_clear_search"><span class="dashicons-before dashicons-no"></span><span class="screen-reader-text">Clear Search</a></a>':''
     );
 }
 
+
+
+//load series thumbnail
+//default thumb: dashicons-format-quote
