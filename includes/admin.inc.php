@@ -119,9 +119,9 @@ function sermonz_options_page_html()
 			</td>
 		</tr>
         <tr valign="top">
-			<th scope="row">Custom CSS (optional)q</th>
+			<th scope="row">Custom CSS (optional)</th>
 			<td>
-				<textarea name="sermonz_css" ><?php echo esc_html( get_option('sermonz_css') ); ?></textarea>
+				<textarea style="width: 400px" name="sermonz_css" ><?php echo esc_html( get_option('sermonz_css') ); ?></textarea>
 			</td>
         </tr>
     </table>
