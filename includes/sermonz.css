@@ -1,3 +1,6 @@
+.entry-content .sermonz {
+    margin-top: -10px;
+}
 .entry-content .sermonz a {
     text-decoration: none;
 }
@@ -53,50 +56,63 @@
 .error {
     color: red;
 }
-.entry-content .sermonz_series_list {
+.entry-content .sermonz_series_list,
+.entry-content .sermonz_sermons_list {
+    clear:left;
     margin-top: 0.5em;
 }
-.entry-content .sermonz_series_row {
+.entry-content .sermonz_series_row,
+.entry-content .sermonz_sermon_row {
     width: 48%;
     float: left;
 }
-.entry-content .sermonz_series_row:nth-child(odd) {
+.entry-content .sermonz_series_row:nth-child(odd),
+.entry-content .sermonz_sermon_row:nth-child(odd) {
     margin-right: 4%;
 }
 .entry-content .sermonz_series_row a,
-.entry-content .sermonz_series_row a:hover {
+.entry-content .sermonz_series_row a:hover,
+.entry-content .sermonz_sermon_row a,
+.entry-content .sermonz_sermon_row a:hover {
     text-decoration: none;    
     -webkit-box-shadow: none;
     box-shadow: none;
     -webkit-transition: none;
 }
-.entry-content .sermonz_series_row a:hover {
+.entry-content .sermonz_series_row:hover,
+.entry-content .sermonz_sermon_row:hover {
     opacity: 0.8;
 }
-.entry-content .sermonz_series_row img {
+.entry-content .sermonz_series_row img ,
+.entry-content .sermonz_sermon_row img {
     width: 100%;
     border: 0;
     -webkit-box-shadow: none;
     box-shadow: none;
     border: 1px solid #999;
 }
-.entry-content .sermonz_series_row.active img {
+.entry-content .sermonz_series_row.active img ,
+.entry-content .sermonz_sermon_row.active img {
     border: 4px solid red;
 }
-.entry-content .sermonz_series_row {
+.entry-content .sermonz_series_row,
+.entry-content .sermonz_sermon_row {
     margin: 1em 0 1em;
 }
-.entry-content .sermonz_series_row p {
+.entry-content .sermonz_series_row p,
+.entry-content .sermonz_sermon_row p {
     margin-bottom: 0;
 }
-.entry-content .sermonz_series_row p.sermonz_series_name {
+.entry-content .sermonz_series_row p.sermonz_series_name,
+.entry-content .sermonz_sermon_row p.sermonz_metadata {
     font-size: 0.8em;
     max-width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.entry-content .sermonz_series_row p.sermonz_date_range {
+.entry-content .sermonz_series_row p.sermonz_date_range ,
+.entry-content .sermonz_sermon_row p.sermonz_metadata.secondary {
     font-size: 0.7em;
 }
 

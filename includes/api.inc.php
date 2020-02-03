@@ -84,6 +84,9 @@ class SermonzApi
                 }
                 break;
             case "sermon":
+            default:
+                $this->load_sermons();
+                $this->title = "Sermons";
                 break;
         }
     }
@@ -408,6 +411,107 @@ class SermonzApi
             (int)$tmp_search->page_size>0&&(int)$tmp_search->page_size<100?(int)$tmp_search->page_size:10
         );
         return $url;
+    }
+
+
+    private function load_sermons()
+    {
+        $tmp_search = clone $this->active_search;
+        $params = [
+            order_by => get_query_var('order_by'),
+            order_direction => get_query_var('order_direction')
+        ];
+
+        $url = "/sermons";
+        
+        $parameters = array();
+        if ($this->active_search->keywords) 
+        {
+            $parameters["keywords"]=$tmp_search->keywords;
+        }
+        if ($this->active_search->series_id) 
+        {
+            $parameters["series_id"]=$tmp_search->series_id;
+        }
+        if ($this->active_search->speaker) 
+        {
+            $parameters["speaker"]=$tmp_search->speaker;
+        }
+        if ($this->active_search->book) 
+        {
+            $parameters["book"]=$tmp_search->book;
+        }
+
+        $parameters["page"]=(int)$tmp_search->page?(int)$tmp_search->page:1;
+        $parameters["page_size"]=(int)$tmp_search->page_size>0?(int)$tmp_search->page_size:10;
+
+        $result = $this->call_api($url, $parameters);
+        if ($result instanceof SermonzError)
+        {
+            $this->content .= sprintf('<p class="error">%s</p>', $result->error);
+            return;
+        }
+
+        $sermons = json_decode($result);
+        if (!$sermons || !count($sermons)) {
+            $this->content .= sprintf('<p>No sermons found</p>');
+            return;
+        }
+        $this->title = "Series";
+        $this->content .= '<div class="sermonz_series_list">';
+        foreach ($sermons->sermons as $sermon) 
+        {
+            $sermon_url = sprintf(
+                '%s/sermon/%s',
+                $this->base_url,
+                $sermon->id
+            );
+            
+            $date = date_format(date_create($sermon->sermon_date), "d M Y");
+            
+            $this->content .= sprintf
+            (
+                '<div class="sermonz_sermon_row">
+                    <a href="%s"><img src="%s" border="0" alt="%s" /></a>
+                    <p class="sermonz_metadata sermonz_sermon_name"><b><a href="%s">%s</a></b></p>
+                    <p class="sermonz_metadata sermonz_sermon_series"><a href="%s">%s</a></p>
+                    <p class="sermonz_metadata sermonz_sermon_speaker "><a href="%s">%s</a></p>
+                    <p class="sermonz_metadata sermonz_sermon_date secondary"><a href="%s">%s | %s</a></p>
+                </div>',
+                $sermon_url,
+                esc_attr($sermon->series_thumb),
+                esc_html($sermon->sermon_title),
+                $sermon_url,
+                esc_html($sermon->sermon_title),
+                $sermon_url,
+                esc_html($sermon->series_name),
+                $sermon_url,
+                esc_html($sermon->speaker),
+                $sermon_url,
+                esc_html($date),
+                esc_html($sermon->passage)
+            );
+        }
+        $this->content .= '</div>';
+    }
+
+    private function load_sermon_item($id)
+    {
+        $url = "/series/".(int)$id;
+        $result = $this->call_api($url);
+        if ($result instanceof SermonzError)
+        {
+            $this->content .= sprintf('<p class="error">%s</p>', $result->error);
+            return;
+        }
+        $series = json_decode($result);
+        if (!$series) {
+            $this->content .= sprintf('<p class="error">Error: cannot load series with id, %s</p>', (int)$id);
+            return;
+        }
+
+        $this->title = $series->name;
+        $this->content = "<img src=\"".html_entities($series->series_thumb)."\" width=\"30\" />";
     }
 }
 
