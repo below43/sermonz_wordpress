@@ -168,7 +168,7 @@ class SermonzApi
         }
 
         $this->title = "Speakers";
-        $this->content .= '<div class="sermonz_filter_list">';
+        $this->content .= '<div class="sermonz_filter_list"><br/>';
         foreach ($speakers as $speaker) 
         {
             $speaker_url = $this->build_url(array("speaker"=>$speaker));
@@ -356,9 +356,10 @@ class SermonzApi
         return $result;
     }
 
-    public function clear_filter_and_build_url()
+    public function clear_filter_and_build_url($argument = null)
     {
-        switch ($this->argument)
+        if (!$argument) $argument = $this->argument;
+        switch ($argument)
         {
             case "series":
                 if (!$this->active_search->series_id) return false;
@@ -375,6 +376,7 @@ class SermonzApi
         }
         return false;
     }
+
     public function build_url($params=array())
     {
         $tmp_search = clone $this->active_search;

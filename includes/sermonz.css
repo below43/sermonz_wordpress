@@ -22,9 +22,6 @@
     width: 96%;
 }
 .sermonz_search_filters_wrap .sermon_search_filters_wrap_a a {
-    float:left; 
-    margin-right: 10px;
-    margin-bottom: 1em;
 }
 .sermonz_search_filters_wrap .sermonz_show_search {
     width: 4%;
@@ -119,21 +116,36 @@
     margin-right: 15px;
 }
 
-.sermonz_search_filters_wrap .sermonz_filter,
-.sermonz_search_filters_wrap .sermonz_filter.active {
+.sermonz_search_filters_wrap .sermonz_filter {
+    float:left; 
+    margin-right: 10px;
+    margin-bottom: 1em;
     border: 1px solid darkgray;
     color: darkgray;
     padding: 4px;
 }
-
+.sermonz_search_filters_wrap .sermonz_filter a {
+    color: darkgray;
+}
+.sermonz_search_filters_wrap .sermonz_filter:hover, 
 .sermonz_search_filters_wrap .sermonz_filter.active {
     border: 1px solid black;
     color: black;
     padding: 4px;
-    margin-bottom: 10px;
+}
+.sermonz_search_filters_wrap .sermonz_filter.active {
+    padding-right: 8px;
+}
+.sermonz_search_filters_wrap .sermonz_filter:hover a, 
+.sermonz_search_filters_wrap .sermonz_filter.active a {
+    color: black;
 }
 
 .sermonz_filter_href.active {
     color: red;
     opacity: 1;
+}
+
+.sermonz_clear_filter .dashicons {
+    line-height: 1.2em;
 }

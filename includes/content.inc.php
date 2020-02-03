@@ -144,19 +144,22 @@ function get_filter_content()
         }
         if ($active) $active_count++;
         $base_url = sermonz_get_page_uri();
+        $clear_filter_url = $sermonz_api->clear_filter_and_build_url(str_replace("/filter/", "", $filter));
         $filter_html .= sprintf(
-            '<a href="%s" id="%s" class="%s">%s</a>',
-            esc_attr_x($base_url.$filter, "sermonz href for filter"),
-            strtolower($label),
+            '<div class="%s" ><a href="%s" id="%s" title="%s">%s</a> %s</div>',
             $classes,
-            ($active)?esc_html($label).": ".esc_html($filter_val):"Filter by ".esc_html($label)
+            esc_attr_x($base_url.$filter, "sermonz href for filter"),
+            esc_attr_x($filter, "sermonz title for filter"),
+            strtolower($label),
+            ($active)?esc_html($label).": ".esc_html($filter_val):"Filter by ".esc_html($label),
+            ($active)?sprintf('<a href="%s" class="sermonz_clear_filter" title="%s"><span class="dashicons dashicons-no"></span></a>', $clear_filter_url, esc_attr_x("Clear filter", "sermonz clear filter title")):""
         );
     }
     return sprintf(
-        '<div class="sermonz_search_filters_wrap">%s<div class="sermon_search_filters_wrap_a">%s</div>%s</div>',
+        '<div class="sermonz_search_filters_wrap">%s<div class="sermon_search_filters_wrap_a">%s</div></div>',
         '<a class="sermonz_show_search"><span class="dashicons-before dashicons-search"></span><span class="screen-reader-text">Show Search</a></a>',
-        $filter_html,
-        $active_count?'<a class="sermonz_clear_search"><span class="dashicons-before dashicons-no"></span><span class="screen-reader-text">Clear Search</a></a>':''
+        $filter_html
+        //$active_count?'<a class="sermonz_clear_search"><span class="dashicons-before dashicons-no"></span><span class="screen-reader-text">Clear Search</a></a>':''
     );
 }
 
