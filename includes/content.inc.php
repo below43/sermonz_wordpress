@@ -50,7 +50,7 @@ function sermonz_filter_content($content)
     $sermonz_content = '<div class="sermonz">';
 	if (get_the_ID() == get_option('sermonz_page')) 
 	{
-        $base_url = $sermonz_api->build_url();
+        $base_url = $sermonz_api->build_url(array("page"=>1));
         
         if ($sermonz_api->route=="filter")
         {
@@ -136,7 +136,7 @@ function get_filter_content()
             case "Speaker":
                 if (isset($sermonz_api->active_search->speaker)&&$sermonz_api->active_search->speaker)
                 {
-                    $classes.="active ";
+                    $classes.="active "; 
                     $active = true;
                     $filter_val = $sermonz_api->active_search->speaker;
                 }

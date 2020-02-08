@@ -106,34 +106,35 @@ class SermonzApi
         {
             $search = new SermonzSearch();
         }
-        if (isset($_GET['keywords'])) {
-            $search->keywords = $_GET['keywords'];
+
+        if ($keywords = get_query_var('keywords')) {
+            $search->keywords = $keywords;
         }
-        if (isset($_GET['series_id'])) {
-            $search->series_id = (int)$_GET['series_id']>0?(int)$_GET['series_id']:null;
+        if ($series_id =  get_query_var('series_id')) {
+            $search->series_id = (int)$series_id>0?(int)$series_id:null;
         }
-        if (isset($_GET['series_name'])) {
-            $search->series_name = $_GET['series_name']?$_GET['series_name']:null;
+        if ($series_name =  get_query_var('series_name')) {
+            $search->series_name = $series_name;
         }
-        if (isset($_GET['book'])) {
+        if ($book =  get_query_var('book')) {
             $search->book = 
             (
-                in_array($_GET['book'], $this->testaments["Old Testament"]) ||
-                in_array($_GET['book'], $this->testaments["New Testament"])
-            )?$_GET['book']:"";
+                in_array($book, $this->testaments["Old Testament"]) ||
+                in_array($book, $this->testaments["New Testament"])
+            )?$book:"";
         }
-        if (isset($_GET['speaker'])) {
-            $search->speaker = $_GET['speaker'];
+        if ($speaker =  get_query_var('speaker')) {
+            $search->speaker = $speaker;
         }
-        if (isset($_GET['page'])) 
+        if ($page_number = get_query_var('page_number')) 
         {
-            $search->page = ((int)$_GET['page']>0)?(int)$_GET['page']:1;
+            $search->page_number = $page_number>0?$page_number:1;
         }
-        if (isset($_GET['page_size']))
+        if ($page_size =  get_query_var('page_size'))
         {
-            if (is_int($_GET['page_size'])&&$_GET['page_size']>0&&$_GET['page_size']<101) 
+            if ($page_size&&$page_size>0&&$page_size<101) 
             {
-                $search->page_size = $_GET['page_size'];
+                $search->page_size = $page_size;
             }
             else 
             {
@@ -174,7 +175,10 @@ class SermonzApi
         $this->content .= '<div class="sermonz_filter_list"><br/>';
         foreach ($speakers as $speaker) 
         {
-            $speaker_url = $this->build_url(array("speaker"=>$speaker));
+            $speaker_url = $this->build_url(array(
+                "speaker"=>$speaker,
+                "page_number"=>1
+            ));
             $this->content .= sprintf
             (
                 '<div class="sermonz_filter_row">
@@ -223,7 +227,10 @@ class SermonzApi
             {
                 if (in_array($book, $books))
                 {
-                    $series_url = $this->build_url(array("book"=>$book));
+                    $series_url = $this->build_url(array(
+                        "book"=>$book,
+                        "page_number"=>1
+                    ));
                     
                     $this->content .= sprintf
                     (
@@ -253,10 +260,13 @@ class SermonzApi
     private function load_series()
     {
         // $this->route = get_query_var('sermonz_route');
-        // $this->argument = get_query_var('sermonz_argument');
+        $page_number = get_query_var('page_number');
+        if (!$page_number||$page_number<1) $page_number = 1;
         $params = [
             order_by => get_query_var('order_by'),
-            order_direction => get_query_var('order_direction')
+            order_direction => get_query_var('order_direction'),
+            page_size => '100',
+            page_number => $page_number
         ];
 
         $url = "/series/";
@@ -283,7 +293,8 @@ class SermonzApi
                 array
                 (
                     "series_id"=>(int)$series_item->series_id,
-                    "series_name"=>$series_item->series_name
+                    "series_name"=>$series_item->series_name,
+                    "page_number"=>1
                 )
             );
             $from_date = date_format(date_create($series_item->first_sermon_date), "M Y");
@@ -309,6 +320,26 @@ class SermonzApi
                 esc_html($date_range)
             );
         }
+
+
+        $this->content .= sprintf('<div class="sermonz_more_wrap">');
+
+        $base_url = sermonz_get_page_uri();
+        
+        if ($series->page_number>1)
+        {
+            $page_number = $sermons->page_number-1;
+
+            $more = sprintf('%s/filter/series/?page_number=%s', $base_url, $page_number);
+            $this->content .= sprintf('<a href="%s" class="sermonz_previous">Load Previous</a>', $more);
+        }
+        if ($series->row_count > ($series->page_number*$series->page_size))
+        {
+            $page_number = $series->page_number+1;
+            $more = sprintf('%s/filter/series/?page_number=%s', $base_url, $page_number);
+            $this->content .= sprintf('<a href="%s" class="sermonz_more">Load More</a>', $more);
+        }
+        $this->content .= '</div>';
         $this->content .= '</div>';
     }
 
@@ -340,6 +371,7 @@ class SermonzApi
         }
         $curl = curl_init();
         $full_url = $this->hostname.$endpoint;
+        
         $url = sprintf("%s?%s", $full_url, http_build_query($data));   
         
         if ($this->debug) $this->content .= sprintf('<br/><pre>%s</pre>', $url);
@@ -393,7 +425,7 @@ class SermonzApi
         
         $url = sprintf
         (
-            '%s?keywords=%s&series_id=%s&series_name=%s&speaker=%s&book=%s&page=%s&page_size=%s',
+            '%s?keywords=%s&series_id=%s&series_name=%s&speaker=%s&book=%s&page_number=%s&page_size=%s',
             $this->base_url,
             urlencode($tmp_search->keywords),
             urlencode($tmp_search->series_id>0?$tmp_search->series_id:null),
@@ -407,7 +439,7 @@ class SermonzApi
                 )
                 ?$tmp_search->book:null
             ),
-            (int)$tmp_search->page>0?(int)$tmp_search->page:1,
+            (int)$tmp_search->page_number>0?(int)$tmp_search->page_number:1,
             (int)$tmp_search->page_size>0&&(int)$tmp_search->page_size<100?(int)$tmp_search->page_size:10
         );
         return $url;
@@ -442,7 +474,7 @@ class SermonzApi
             $parameters["book"]=$tmp_search->book;
         }
 
-        $parameters["page"]=(int)$tmp_search->page?(int)$tmp_search->page:1;
+        $parameters["page_number"]=(int)$tmp_search->page_number?(int)$tmp_search->page_number:1;
         $parameters["page_size"]=(int)$tmp_search->page_size>0?(int)$tmp_search->page_size:10;
 
         $result = $this->call_api($url, $parameters);
@@ -457,8 +489,10 @@ class SermonzApi
             $this->content .= sprintf('<p>No sermons found</p>');
             return;
         }
-        $this->title = "Series";
-        $this->content .= '<div class="sermonz_series_list">';
+        $this->title = "Sermons";
+        
+        $this->content .= sprintf('<p class="sermonz_row_count">%s sermon%s</p>', $sermons->row_count, $sermons->row_count!=1?"s":"");
+        $this->content .= '<div class="sermons_series_pages"><div class="sermonz_series_list">';
         foreach ($sermons->sermons as $sermon) 
         {
             $sermon_url = sprintf(
@@ -492,7 +526,24 @@ class SermonzApi
                 esc_html($sermon->passage)
             );
         }
-        $this->content .= '</div>';
+
+        $this->content .= sprintf('<div class="sermonz_more_wrap">');
+
+        if ($sermons->page_number>1)
+        {
+            $page_number = $sermons->page_number-1;
+            $more = $this->build_url(array("page_number"=>$page_number?$page_number:1));
+            $this->content .= sprintf('<a href="%s" class="sermonz_previous">Load Previous</a>', $more);
+        }
+        if ($sermons->row_count > ($sermons->page_number*$sermons->page_size))
+        {
+            $page_number = $sermons->page_number+1;
+            $more = $this->build_url(array("page_number"=>$page_number));
+            $this->content .= sprintf('<a href="%s" class="sermonz_more">Load More</a>', $more);
+        }
+        $this->content .= '</div>'; 
+        $this->content .= '</div></div>'; 
+
     }
 
     private function load_sermon_item($id)
@@ -536,6 +587,6 @@ class SermonzSearch
     public $series_name="";
     public $speaker="";
     public $book="";
-    public $page=1;
+    public $page_number=1;
     public $page_size=10;
 }

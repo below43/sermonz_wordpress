@@ -47,5 +47,7 @@ function sermonz_insert_query_vars( $vars )
 	array_push($vars, 'speaker');
 	array_push($vars, 'book');
 	array_push($vars, 'keywords');
+	array_push($vars, 'page_number');
+	array_push($vars, 'page_size');
     return $vars;
-}
+} 

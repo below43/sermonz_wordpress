@@ -1,5 +1,5 @@
 .entry-content .sermonz {
-    margin-top: -10px;
+    margin-top: 0px;
 }
 .entry-content .sermonz a {
     text-decoration: none;
@@ -55,8 +55,8 @@
 
 .error {
     color: red;
-}
-.entry-content .sermonz_series_list,
+} 
+.entry-content .sermons_series_pages,
 .entry-content .sermonz_sermons_list {
     clear:left;
     margin-top: 0.5em;
@@ -164,4 +164,33 @@
 
 .sermonz_clear_filter .dashicons {
     line-height: 1.2em;
+}
+
+
+.sermonz_more_wrap {
+    clear: left;
+    text-align: center;
+    margin: 40px auto;
+    padding-top: 20px;
+    width: 100%;
+}
+.sermonz_more, 
+.sermonz_previous {
+    border: 1px solid darkgray;
+    color: darkgray;
+    font-weight: 400;
+    padding: 8px;
+    display: block;
+    width: 200px;
+    margin: 0 auto;
+}
+.sermonz_previous {
+    margin-bottom: 20px;
+}
+
+.sermonz_row_count {
+    font-size: 0.7em;    
+    color: darkgray;
+    padding-top: 12px;
+    clear: left;
 }

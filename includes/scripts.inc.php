@@ -22,11 +22,11 @@ function sermonz_enqueue_scripts() {
     wp_enqueue_style( 'sermonz' );
     wp_enqueue_script( 
         'sermonz', 
-        plugins_url('/sermonz.js', __FILE__)
-        //array( 'jquery' ) 
+        plugins_url('/sermonz.js', __FILE__),
+        array( 'jquery' ) 
     );
 }
-
+ 
 function sermonz_load_dashicons(){
     wp_enqueue_style('dashicons');
 }
