@@ -30,6 +30,8 @@ function sermonz_filter_head_title($title)
     if (get_the_ID() == get_option('sermonz_page')) {
         global $sermonz_api;
 		array_unshift($title, $sermonz_api->title);
+        remove_action( 'wp_head', 'rel_canonical' );
+        add_action( 'wp_head', 'new_rel_canonical' );
     	return array(implode(" $sep ", $title));
 	}
 	return $title;
@@ -164,6 +166,31 @@ function get_filter_content()
 }
 
 
-
-//load series thumbnail
-//default thumb: dashicons-format-quote
+function new_rel_canonical() {
+        global $sermonz_api;
+    
+        $link = get_permalink();
+        
+        if ($sermonz_api->route=="filter")
+        {
+            //no canonical for this
+        }
+        else if ($sermonz_api->route=="sermon")
+        {
+            //no canonical for view sermon
+        }
+        else if ($sermonz_api->active_search->series_id && $sermonz_api->active_search->page_number==1 && 
+            !($sermonz_api->active_search->passage || $sermonz_api->active_search->speaker || $sermonz_api->active_search->keywords)
+        )
+        {
+            //no canonical for series
+        }
+        else if ($sermonz_api->active_search->page_number>1)
+        {
+            echo sprintf('%s<link rel="canonical" href="%s%s" />%s', "\n", $link, $sermonz_api->active_search->page_number, "\n");
+        }
+        else 
+        {
+            echo sprintf('%s<link rel="canonical" href="%s" />%s', "\n", $link, "\n");
+        }
+}

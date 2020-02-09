@@ -85,8 +85,11 @@ class SermonzApi
                 break;
             case "sermon":
             default:
+                if (!$this->series_name)
+                {
+                    $this->title = "Sermons";
+                }
                 $this->load_sermons();
-                $this->title = "Sermons";
                 break;
         }
     }
@@ -112,9 +115,8 @@ class SermonzApi
         }
         if ($series_id =  get_query_var('series_id')) {
             $search->series_id = (int)$series_id>0?(int)$series_id:null;
-        }
-        if ($series_name =  get_query_var('series_name')) {
-            $search->series_name = $series_name;
+            $series = $this->load_series_item($search->series_id);
+            $this->series_name = $search->series_name = $series->series_name;
         }
         if ($book =  get_query_var('book')) {
             $search->book = 
@@ -126,9 +128,9 @@ class SermonzApi
         if ($speaker =  get_query_var('speaker')) {
             $search->speaker = $speaker;
         }
-        if ($page_number = get_query_var('page_number')) 
+        if ($page = get_query_var('page')) 
         {
-            $search->page_number = $page_number>0?$page_number:1;
+            $search->page_number = $page>0?$page:1;
         }
         if ($page_size =  get_query_var('page_size'))
         {
@@ -177,7 +179,7 @@ class SermonzApi
         {
             $speaker_url = $this->build_url(array(
                 "speaker"=>$speaker,
-                "page_number"=>1
+                "page"=>1
             ));
             $this->content .= sprintf
             (
@@ -229,7 +231,7 @@ class SermonzApi
                 {
                     $series_url = $this->build_url(array(
                         "book"=>$book,
-                        "page_number"=>1
+                        "page"=>1
                     ));
                     
                     $this->content .= sprintf
@@ -347,7 +349,7 @@ class SermonzApi
     {
         $url = "/series/".(int)$id;
         $result = $this->call_api($url);
-        if ($result instanceof SermonzError)
+        if ($result instanceof SermonzError) 
         {
             $this->content .= sprintf('<p class="error">%s</p>', $result->error);
             return;
@@ -356,13 +358,11 @@ class SermonzApi
         if (!$series) {
             $this->content .= sprintf('<p class="error">Error: cannot load series with id, %s</p>', (int)$id);
             return;
-        }
-
-        $this->title = $series->name;
-        $this->content = "<img src=\"".html_entities($series->series_thumb)."\" width=\"30\" />";
+        } 
+        return $series;
     }
 
-    private function call_api($endpoint, $data = false)
+    private function call_api($endpoint, $data = array())
     {
         if (!function_exists('curl_version'))
         {
@@ -371,8 +371,7 @@ class SermonzApi
         }
         $curl = curl_init();
         $full_url = $this->hostname.$endpoint;
-        
-        $url = sprintf("%s?%s", $full_url, http_build_query($data));   
+        $url = sprintf('%s?%s', $full_url, http_build_query($data));   
         
         if ($this->debug) $this->content .= sprintf('<br/><pre>%s</pre>', $url);
         curl_setopt($curl, CURLOPT_URL, $url);
@@ -425,7 +424,7 @@ class SermonzApi
         
         $url = sprintf
         (
-            '%s?keywords=%s&series_id=%s&series_name=%s&speaker=%s&book=%s&page_number=%s&page_size=%s',
+            '%s?keywords=%s&series_id=%s&series_name=%s&speaker=%s&book=%s&page=%s&page_size=%s',
             $this->base_url,
             urlencode($tmp_search->keywords),
             urlencode($tmp_search->series_id>0?$tmp_search->series_id:null),
@@ -464,6 +463,11 @@ class SermonzApi
         if ($this->active_search->series_id) 
         {
             $parameters["series_id"]=$tmp_search->series_id;
+            if ($this->series_name) {
+                // $series = $this->load_series_item($parameters["series_id"]);
+                // $this->series_name = $series->series_name;
+                $this->title = sprintf("%s", $this->series_name); //$series->series_name); 
+            }
         }
         if ($this->active_search->speaker) 
         {
@@ -489,7 +493,6 @@ class SermonzApi
             $this->content .= sprintf('<p>No sermons found</p>');
             return;
         }
-        $this->title = "Sermons";
         
         $this->content .= sprintf('<p class="sermonz_row_count">%s sermon%s</p>', $sermons->row_count, $sermons->row_count!=1?"s":"");
         $this->content .= '<div class="sermons_series_pages"><div class="sermonz_series_list">';
