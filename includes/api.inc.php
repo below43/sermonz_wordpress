@@ -545,7 +545,7 @@ class SermonzApi
             $this->content .= sprintf('<a href="%s" class="sermonz_more">Load More</a>', $more);
         }
         $this->content .= '</div>'; 
-        $this->content .= '</div></div>'; 
+        $this->content .= '</div></div><div class="sermonz_loading" style="display:none"><center><small>Loading...</small></center></div>'; 
 
     }
 

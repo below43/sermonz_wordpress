@@ -179,13 +179,15 @@ function new_rel_canonical() {
         {
             //no canonical for view sermon
         }
-        else if ($sermonz_api->active_search->series_id && $sermonz_api->active_search->page_number==1 && 
-            !($sermonz_api->active_search->passage || $sermonz_api->active_search->speaker || $sermonz_api->active_search->keywords)
+        else if ($sermonz_api->active_search->series_id &&
+            !($sermonz_api->active_search->passage || $sermonz_api->active_search->speaker || $sermonz_api->active_search->keywords || $sermonz_api->active_search->page_size!=10)
         )
         {
             //no canonical for series
         }
-        else if ($sermonz_api->active_search->page_number>1)
+        else if ($sermonz_api->active_search->page_number>1 &&
+            !($sermonz_api->active_search->passage || $sermonz_api->active_search->speaker || $sermonz_api->active_search->keywords || $sermonz_api->active_search->page_size!=10)
+        )
         {
             echo sprintf('%s<link rel="canonical" href="%s%s" />%s', "\n", $link, $sermonz_api->active_search->page_number, "\n");
         }
