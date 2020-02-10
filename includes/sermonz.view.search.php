@@ -72,7 +72,7 @@ class SermonzViewSearch
                     break;
             }
             if ($active) $active_count++;
-            $base_url = sermonz_get_page_uri();
+            $base_url = $this->_sermonz_controller->base_url;
             $clear_filter_url = $this->_sermonz_controller->clear_filter_and_build_url(str_replace("/filter/", "", $filter));
             $filter_html .= sprintf(
                 '<div class="%s" ><a href="%s" id="%s" title="%s">%s</a> %s</div>',

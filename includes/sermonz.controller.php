@@ -1,24 +1,24 @@
 <?php
 
+add_action('init', 'sermonz_start_session', 1);
 function sermonz_start_session() {
     if(!session_id()) {
         session_start();
     }
 }
 
-add_action('init', 'sermonz_start_session', 1);
 
 add_action( 'pre_get_posts', 'sermonz_start' ); 
 
-global $sermonz_api_url;
 function sermonz_start()
 {
-    global $sermonz_controller;
-    $sermonz_api_url = get_option('sermonz_api_url');
-
-    $base_url = sermonz_get_page_uri();
-
-    $sermonz_controller = new SermonzController($sermonz_api_url, $base_url);
+    if (get_the_ID() == get_option('sermonz_page')) 
+    {
+        global $sermonz_controller;
+        $sermonz_api_url = get_option('sermonz_api_url');
+        $base_url = sermonz_get_page_uri();
+        $sermonz_controller = new SermonzController($sermonz_api_url, $base_url);
+    }
 }
 
 class SermonzController

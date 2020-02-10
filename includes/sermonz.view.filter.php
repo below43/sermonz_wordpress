@@ -248,7 +248,7 @@ class SermonzViewFilter
 
         $this->_content .= sprintf('<div class="sermonz_more_wrap">');
 
-        $base_url = sermonz_get_page_uri();
+        $base_url = $this->_sermonz_controller->base_url;
         
         if ($series->page_number>1)
         {
