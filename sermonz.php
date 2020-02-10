@@ -16,8 +16,8 @@ include('includes/scripts.inc.php');
 //configure routing
 include('includes/routes.inc.php');
 
-//fetch the sermonz content
-include('includes/api.inc.php');
+//fetch the sermonz content 
+include('includes/sermonz.controller.php');
 
 //render the sermonz content
 include('includes/shortcode.inc.php');
