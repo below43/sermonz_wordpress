@@ -150,8 +150,8 @@ class SermonzViewSearch
         {
             $sermon_url = sprintf(
                 '%s/sermon/%s',
-                $this->base_url,
-                $sermon->id
+                $this->_sermonz_controller->base_url,
+                $sermon->sermon_id
             );
             
             $date = date_format(date_create($sermon->sermon_date), "d M Y");

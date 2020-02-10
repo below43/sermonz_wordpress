@@ -1,5 +1,13 @@
 <?php
 
+function sermonz_start_session() {
+    if(!session_id()) {
+        session_start();
+    }
+}
+
+add_action('init', 'sermonz_start_session', 1);
+
 add_action( 'pre_get_posts', 'sermonz_start' ); 
 
 global $sermonz_api_url;
@@ -9,6 +17,7 @@ function sermonz_start()
     $sermonz_api_url = get_option('sermonz_api_url');
 
     $base_url = sermonz_get_page_uri();
+
     $sermonz_controller = new SermonzController($sermonz_api_url, $base_url);
 }
 
@@ -24,7 +33,7 @@ class SermonzController
     public $show_back = false;
     public $active_search = null;
     
-    // public $debug = true;
+    public $debug = false; //true;
 
     public $testaments = array
     (
@@ -42,7 +51,10 @@ class SermonzController
     {
         $this->hostname = sprintf("https://%s", str_replace("http://", "", str_replace("https://", "", rtrim($hostname, "/"))));
         $this->base_url = $base_url;
-        $this->_initialise_page();
+        if (get_the_ID() == get_option('sermonz_page')) 
+        {
+            $this->_initialise_page();
+        }
     }
 
     private function _initialise_page()
@@ -58,6 +70,8 @@ class SermonzController
                 $this->_load_filter($this->argument);
                 break;
             case "sermon":
+                $this->_load_sermon($this->argument);
+                break;
             default:
                 $this->_load_sermons();
                 break;
@@ -67,7 +81,7 @@ class SermonzController
     private function _initialise_search()
     {
         $search = null;
-        session_start();
+
         //if we have an active route, then use session, otherwise use GET only
         if ($this->route&&isset($_SESSION['sermonz_active_search']))
         {
@@ -129,6 +143,13 @@ class SermonzController
     {
         $sermons = new SermonzViewSearch($this);
         $this->content .= $sermons->get_content();
+    }
+
+    private function _load_sermon($filter_arg)
+    {
+        $this->title = "Sermon";
+        $this->content .= "Coming soon...";
+        // $this->title = $filter->get_title();
     }
 
     private function _load_series_item($id)

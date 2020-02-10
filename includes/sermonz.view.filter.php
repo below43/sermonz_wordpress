@@ -109,7 +109,7 @@ class SermonzViewFilter
                     <p class="sermonz_filter_name"><b><a href="%s" class="sermonz_filter_href %s">%s</a></b></p>
                 </div>',
                 $speaker_url,
-                $speaker==$this->active_search->speaker?" active":"",
+                $speaker==$this->_active_search->speaker?" active":"",
                 esc_html($speaker)
             );        
         }
