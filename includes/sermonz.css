@@ -48,6 +48,9 @@
     width: 50%;
     float:left;
 }
+.sermonz_sermon_inner_head {
+    width: 100%; 
+}
 .sermonz_filter_inner_head.right {
     width: 50%;
     text-align:right;
@@ -193,4 +196,42 @@
     color: darkgray;
     padding-top: 12px;
     clear: left;
+}
+.entry-content .sermonz_sermon_series_thumb {
+    float: right;
+    width: 44%;
+    margin: 0.5em 0 0 0;
+}
+.entry-content .sermonz_sermon_page {
+}
+.entry-content .sermonz_sermon_page .sermonz_metadata {
+    margin: 0 0 0.3em;
+    font-size: 1em;
+}
+.entry-content .sermonz_sermon_page .sermonz_metadata .dashicons {
+    opacity: 0.2;
+}
+.entry-content .sermonz_metadata span.label {
+    opacity: 0.6;
+    font-size: 0.8em;
+    width: 100%;
+    display: block;
+}
+
+.entry-content .sermonz_sermon_page .sermonz_metadata.sermonz_metadata_title  {
+    font-size: 1.6em;
+    margin-bottom: 1.4em;
+    line-height: 1em;
+}
+.entry-content .sermonz_sermon_page {
+    margin-bottom: 40px;
+}
+.entry-content .sermonz_sermon_page img {
+    width: 100%;
+    /* margin-right: 2%;
+    float: left; */
+}
+.entry-content .sermonz_back_link {
+    margin-top: 40px;
+    opacity: 0.5;
 }

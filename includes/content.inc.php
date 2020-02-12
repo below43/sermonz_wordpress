@@ -26,12 +26,13 @@ function unset_custom_content_filters()
 
 function sermonz_filter_head_title($title) 
 {
-    $sep = apply_filters( 'document_title_separator', '-' );
     if (get_the_ID() == get_option('sermonz_page')) {
+        sermonz_start();
         global $sermonz_controller;
-		array_unshift($title, $sermonz_controller->title);
+		if ($sermonz_controller->title) array_unshift($title, $sermonz_controller->title);
         remove_action( 'wp_head', 'rel_canonical' );
         add_action( 'wp_head', 'new_rel_canonical' );
+        $sep = apply_filters( 'document_title_separator', '-' );
     	return array(implode(" $sep ", $title));
 	}
 	return $title;
@@ -41,7 +42,10 @@ function sermonz_filter_h1_title( $title, $id )
 {
     if ($id == get_option('sermonz_page')) {
         global $sermonz_controller;
-        return $title.=": ".$sermonz_controller->title;
+        if (isset($sermonz_controller->title) && $sermonz_controller->title)
+        { 
+            return ($sermonz_controller->route=="sermon")?$sermonz_controller->title:$title.": ".$sermonz_controller->title;
+        }
     }
     return $title;
 }

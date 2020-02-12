@@ -167,7 +167,7 @@ class SermonzViewSearch
                 </div>',
                 $sermon_url,
                 esc_attr($sermon->series_thumb),
-                esc_html($sermon->sermon_title),
+                esc_attr($sermon->sermon_title),
                 $sermon_url,
                 esc_html($sermon->sermon_title),
                 $sermon_url,

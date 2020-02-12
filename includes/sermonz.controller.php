@@ -1,5 +1,9 @@
 <?php
 
+require('sermonz.view.search.php');
+require('sermonz.view.filter.php');
+require('sermonz.view.sermon.php');
+
 add_action('init', 'sermonz_start_session', 1);
 function sermonz_start_session() {
     if(!session_id()) {
@@ -8,7 +12,7 @@ function sermonz_start_session() {
 }
 
 
-add_action( 'pre_get_posts', 'sermonz_start' ); 
+// add_action( 'pre_get_posts', 'sermonz_start' ); 
 
 function sermonz_start()
 {
@@ -29,7 +33,7 @@ class SermonzController
     public $argument;
 
     public $content = "";
-    public $title = "Sermon Library";
+    public $title = "";
     public $show_back = false;
     public $active_search = null;
     
@@ -147,9 +151,9 @@ class SermonzController
 
     private function _load_sermon($filter_arg)
     {
-        $this->title = "Sermon";
-        $this->content .= "Coming soon...";
-        // $this->title = $filter->get_title();
+        $sermon = new SermonzViewSermon($this, $filter_arg);
+        $this->title = $sermon->get_title();
+        $this->content .= $sermon->get_content();
     }
 
     private function _load_series_item($id)
@@ -277,6 +281,3 @@ class SermonzSearch
     public $page_number=1;
     public $page_size=10;
 }
-
-require('sermonz.view.search.php');
-require('sermonz.view.filter.php');
