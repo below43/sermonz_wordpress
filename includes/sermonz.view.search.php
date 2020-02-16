@@ -20,17 +20,33 @@ class SermonzViewSearch
     }
 
     private function _load_sermons_head()
-    {        
-        $base_url = $this->_sermonz_controller->build_url(array("page"=>1));
+    {
+        
         $sermonz_content = "";
-        $sermonz_content .= sprintf('<form action="%s" class="sermonz_form">', $base_url);
+        $sermonz_content .= sprintf('<form action="%s" method="GET" class="sermonz_form">', $this->_sermonz_controller->base_url);
+        $keyword_search_active = (isset($this->_active_search->keywords) && $this->_active_search->keywords)?"active":"";
         $sermonz_content .= sprintf(
-            '<div class="sermonz_search_field_wrap"><label><span class="screen-reader-text">%s</span><input type="search" class="sermonz_search_field" placeholder="%s" value="%s" name="sermonz_search" title="%s" /></label></div>', 
+            '<input type="hidden" name="speaker" value="%s" />',
+            $this->_active_search->speaker
+        );
+        $sermonz_content .= sprintf(
+            '<input type="hidden" name="series_id" value="%s" />',
+            $this->_active_search->series_id
+        );
+        $sermonz_content .= sprintf(
+            '<input type="hidden" name="book" value="%s" />',
+            $this->_active_search->book
+        );
+        $sermonz_content .= sprintf(
+            '<div class="sermonz_search_field_wrap %s"><label><span class="screen-reader-text">%s</span><input type="search" class="keywords" placeholder="%s" name="keywords" title="%s" value="%s" /></label>
+            <a style="cursor:pointer" class="sermonz_clear_search"><span class="dashicons dashicons-no-alt"></span><span class="screen-reader-text">Clear Search</span></a></div>', 
+            $keyword_search_active,
             esc_attr_x('Search sermon library', 'sermon search text box'),
             esc_attr_x('Search sermons', 'sermon search text box'),
             esc_attr_x('Search', 'sermon search text box'),
             esc_attr($this->_active_search->keywords)
         );
+
 
         $filter_html = '';
     
@@ -81,14 +97,15 @@ class SermonzViewSearch
                 esc_attr_x($filter, "sermonz title for filter"),
                 strtolower($label),
                 ($active)?esc_html($label).": ".esc_html($filter_val):"Filter by ".esc_html($label),
-                ($active)?sprintf('<a href="%s" class="sermonz_clear_filter" title="%s"><span class="dashicons dashicons-no"></span></a>', $clear_filter_url, esc_attr_x("Clear filter", "sermonz clear filter title")):""
+                ($active)?sprintf('<a href="%s" class="sermonz_clear_filter" title="%s"><span class="dashicons dashicons-no-alt"></span></a>', $clear_filter_url, esc_attr_x("Clear filter", "sermonz clear filter title")):""
             );
         }
         $sermonz_content .= sprintf(
-            '<div class="sermonz_search_filters_wrap">%s<div class="sermon_search_filters_wrap_a">%s</div></div>',
-            '<a class="sermonz_show_search"><span class="dashicons-before dashicons-search"></span><span class="screen-reader-text">Show Search</a></a>',
+            '<div class="sermonz_search_filters_wrap">
+            <a class="sermonz_show_search %s"><span class="dashicons-before dashicons-search"></span><span class="screen-reader-text">Show Search</span></a>
+            <div class="sermon_search_filters_wrap_a">%s</div></div>',
+            $keyword_search_active,
             $filter_html
-            //$active_count?'<a class="sermonz_clear_search"><span class="dashicons-before dashicons-no"></span><span class="screen-reader-text">Clear Search</a></a>':''
         );
 
         $sermonz_content .= "</form>";
@@ -106,18 +123,14 @@ class SermonzViewSearch
         $url = "/sermons";
         
         $parameters = array();
+        
         if ($this->_active_search->keywords) 
         {
-            $parameters["keywords"]=$tmp_search->keywords;
+            $parameters["search"]=$tmp_search->keywords;
         }
         if ($this->_active_search->series_id) 
         {
             $parameters["series_id"]=$tmp_search->series_id;
-            if ($this->series_name) {
-                // $series = $this->load_series_item($parameters["series_id"]);
-                // $this->series_name = $series->series_name;
-                $this->title = sprintf("%s", $this->series_name); //$series->series_name); 
-            }
         }
         if ($this->_active_search->speaker) 
         {
@@ -145,6 +158,13 @@ class SermonzViewSearch
         }
         
         $this->_content .= sprintf('<p class="sermonz_row_count">%s sermon%s</p>', $sermons->row_count, $sermons->row_count!=1?"s":"");
+
+        if ($sermons->page_number>1)
+        {
+            $page_number = $sermons->page_number-1;
+            $more = $this->_sermonz_controller->build_url(array("page_number"=>$page_number?$page_number:1));
+            $this->_content .= sprintf('<div class="sermonz_more_wrap"><a href="%s" class="sermonz_previous">Load Previous</a></div>', $more);
+        }
         $this->_content .= '<div class="sermons_series_pages"><div class="sermonz_series_list">';
         foreach ($sermons->sermons as $sermon) 
         {
@@ -181,13 +201,6 @@ class SermonzViewSearch
         }
 
         $this->_content .= sprintf('<div class="sermonz_more_wrap">');
-
-        if ($sermons->page_number>1)
-        {
-            $page_number = $sermons->page_number-1;
-            $more = $this->_sermonz_controller->build_url(array("page_number"=>$page_number?$page_number:1));
-            $this->_content .= sprintf('<a href="%s" class="sermonz_previous">Load Previous</a>', $more);
-        }
         if ($sermons->row_count > ($sermons->page_number*$sermons->page_size))
         {
             $page_number = $sermons->page_number+1;

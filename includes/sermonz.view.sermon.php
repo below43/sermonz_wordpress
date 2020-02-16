@@ -49,7 +49,7 @@ class SermonzViewSermon
 
         //generate the output
 
-        $base_url = $this->_sermonz_controller->build_url(array("page"=>1));
+        $base_url = $this->_sermonz_controller->build_url(array("page_number"=>1));
         $url_base = get_site_url().$this->_sermonz_controller->base_url;
         $back = (strpos(wp_get_referer(), $url_base)!==false)?'Back to':'Browse'; //dashicons-arrow-left-alt2":"dashicons-screenoptions";
         $sermonz_header_link .= sprintf(
@@ -62,8 +62,8 @@ class SermonzViewSermon
 
 
         $this->_title = sprintf("%s | %s",
-            esc_html($sermon->speaker),
-            esc_html($sermon->passage)
+            esc_html($sermon->passage),
+            esc_html($sermon->speaker)
         );
         $sermon_url = sprintf(
             '%s/sermon/%s',
@@ -71,8 +71,8 @@ class SermonzViewSermon
             $sermon->sermon_id
         );
         
-        $series_url = "";
-        $speaker_url = "";
+        $series_url = $this->_sermonz_controller->single_filter_url("series", $sermon->series_id);
+        $speaker_url = $this->_sermonz_controller->single_filter_url("speakers", $sermon->speaker);
         $date = date_format(date_create($sermon->sermon_date), "d F Y");
         
         $passage_url = sprintf('https://www.biblegateway.com/passage/?search=%s&interface=print', urlencode($sermon->passage));
@@ -84,10 +84,10 @@ class SermonzViewSermon
                 <p class="sermonz_metadata sermonz_metadata_title">%s</p>
                 <div class="sermonz_sermon_series_thumb"><img src="%s" border="0" alt="%s" /></div>
                 <div class="sermonz_metadata_wrap">
-                    <p class="sermonz_metadata sermonz_metadata_date"><span class="label">Date:</span> %s</p>
-                    <p class="sermonz_metadata sermonz_metadata_passage"><span class="label">Passage:</span> <a href="%s" target="_blank">%s &nbsp;<span class="dashicons dashicons-external"></span></a></p>
-                    <p class="sermonz_metadata sermonz_metadata_speaker"><span class="label">Speaker:</span> <a href="%s" target="_blank">%s &nbsp;<span class="dashicons dashicons-screenoptions"></span></a></p>
-                    <p class="sermonz_metadata sermonz_metadata_series"><span class="label">Series:</span> <a href="%s" target="_blank">%s &nbsp;<span class="dashicons dashicons-screenoptions"></span></a></p>
+                    <p class="sermonz_metadata sermonz_metadata_date"><span class="label">Date</span> %s</p>
+                    <p class="sermonz_metadata sermonz_metadata_passage"><span class="label">Passage</span> <a href="%s" target="_blank">%s &nbsp;<span class="dashicons dashicons-external"></span></a></p>
+                    <p class="sermonz_metadata sermonz_metadata_speaker"><span class="label">Speaker</span> <a href="%s">%s &nbsp;<span class="dashicons dashicons-screenoptions"></span></a></p>
+                    <p class="sermonz_metadata sermonz_metadata_series"><span class="label">Series</span> <a href="%s">%s &nbsp;<span class="dashicons dashicons-screenoptions"></span></a></p>
                 </div>
             </div>',
             esc_html($sermon->sermon_title),
@@ -104,7 +104,7 @@ class SermonzViewSermon
         $this->_content .= sprintf
         (
             '<div class="sermonz_sermon_player">
-                <figure class="wp-block-audio"><audio controls="" src="%s?download_file=48644-Mark-9v30-50.mp3" preload="auto"></audio></figure>
+                <figure class="wp-block-audio"><audio controls="" src="%s?download_file=48644-Mark-9v30-50.mp3" preload="metadata"></audio></figure>
             </div>',
             esc_attr($sermon->sermon_file)
         );

@@ -100,10 +100,9 @@ class SermonzController
         if ($keywords = get_query_var('keywords')) {
             $search->keywords = $keywords;
         }
-        if ($series_id =  get_query_var('series_id')) {
-            $search->series_id = (int)$series_id>0?(int)$series_id:null;
-            $series = $this->_load_series_item($search->series_id);
-            $this->series_name = $search->series_name = $series->series_name;
+        if ($speaker =  get_query_var('speaker')) {
+            $search->speaker = $speaker;
+            $this->title = sprintf("Talks by %s",  $speaker);
         }
         if ($book =  get_query_var('book')) {
             $search->book = 
@@ -111,13 +110,17 @@ class SermonzController
                 in_array($book, $this->testaments["Old Testament"]) ||
                 in_array($book, $this->testaments["New Testament"])
             )?$book:"";
+            $this->title = sprintf("Talks on %s", $book);
         }
-        if ($speaker =  get_query_var('speaker')) {
-            $search->speaker = $speaker;
+        if ($series_id =  get_query_var('series_id')) {
+            $search->series_id = (int)$series_id>0?(int)$series_id:null;
+            $series = $this->_load_series_item($search->series_id);
+            $this->series_name = $search->series_name = $series->series_name;
+            $this->title = sprintf("%s", $this->series_name);
         }
-        if ($page = get_query_var('page')) 
+        if ($page_number = get_query_var('page_number')) 
         {
-            $search->page_number = $page>0?$page:1;
+            $search->page_number = $page_number>0?$page_number:1;
         }
         if ($page_size =  get_query_var('page_size'))
         {
@@ -214,11 +217,10 @@ class SermonzController
         
         $url = sprintf
         (
-            '%s?keywords=%s&series_id=%s&series_name=%s&speaker=%s&book=%s&page=%s&page_size=%s',
+            '%s?keywords=%s&series_id=%s&speaker=%s&book=%s&page_number=%s&page_size=%s',
             $this->base_url,
             urlencode($tmp_search->keywords),
             urlencode($tmp_search->series_id>0?$tmp_search->series_id:null),
-            urlencode($tmp_search->series_name),
             urlencode($tmp_search->speaker),
             urlencode
             (
@@ -241,15 +243,36 @@ class SermonzController
         {
             case "series":
                 if (!$this->active_search->series_id) return false;
-                return $this->build_url(array("page"=>1, "series_id"=>null, "series_name"=>""));
+                return $this->build_url(array("page_number"=>1, "series_id"=>null));
                 break;
             case "speakers":
                 if (!$this->active_search->speaker) return false;
-                return $this->build_url(array("page"=>1, "speaker"=>""));
+                return $this->build_url(array("page_number"=>1, "speaker"=>""));
                 break;
             case "books":
                 if (!$this->active_search->book) return false;
-                return $this->build_url(array("page"=>1, "book"=>""));
+                return $this->build_url(array("page_number"=>1, "book"=>""));
+                break;
+        }
+        return false;
+    }
+    
+    public function single_filter_url($argument, $filter_value)
+    {
+        if (!$argument) $argument = $this->_sermonz_controller->argument;
+        switch ($argument)
+        {
+            case "series":
+                return $this->build_url(array("page_number"=>1, "series_id"=>$filter_value, "speaker"=>"", "book"=>""));
+                break;
+            case "speakers":
+                return $this->build_url(array("page_number"=>1, "series_id"=>"", "speaker"=>$filter_value, "book"=>""));
+                break;
+            case "books":
+                return $this->build_url(array("page_number"=>1, "series_id"=>"", "speaker"=>"", "book"=>$filter_value));
+                break;
+            case "keywords":
+                return $this->build_url(array("page_number"=>1, "series_id"=>"", "speaker"=>"", "book"=>""));
                 break;
         }
         return false;
@@ -275,7 +298,6 @@ class SermonzSearch
     }
     public $keywords="";
     public $series_id=null;
-    public $series_name="";
     public $speaker="";
     public $book="";
     public $page_number=1;

@@ -44,7 +44,7 @@ function sermonz_filter_h1_title( $title, $id )
         global $sermonz_controller;
         if (isset($sermonz_controller->title) && $sermonz_controller->title)
         { 
-            return ($sermonz_controller->route=="sermon")?$sermonz_controller->title:$title.": ".$sermonz_controller->title;
+            return sprintf("%s<br/><small>%s</small>", $title, $sermonz_controller->title);
         }
     }
     return $title;
@@ -69,6 +69,22 @@ function new_rel_canonical() {
     
         $link = get_permalink();
         
+        $active_filters = 0;
+        if (isset($sermonz_controller->active_search->series_id) && $sermonz_controller->active_search->series_id) 
+        {
+            $active_filters++;
+        }
+        if (isset($sermonz_controller->active_search->speaker) && $sermonz_controller->active_search->speaker) 
+        {
+            $active_filters++;
+        }
+        if (isset($sermonz_controller->active_search->book) && $sermonz_controller->active_search->book) 
+        {
+            $active_filters++;
+        }
+
+        $keyword_search_active = (isset($sermonz_controller->active_search->keywords) && $sermonz_controller->active_search->keywords);
+        
         if ($sermonz_controller->route=="filter")
         {
             //no canonical for this
@@ -77,17 +93,13 @@ function new_rel_canonical() {
         {
             //no canonical for view sermon
         }
-        else if ($sermonz_controller->active_search->series_id &&
-            !($sermonz_controller->active_search->passage || $sermonz_controller->active_search->speaker || $sermonz_controller->active_search->keywords || $sermonz_controller->active_search->page_size!=10)
-        )
+        else if ($active_filters==1 && !$keyword_search_active)
         {
-            //no canonical for series
+            //no canonical for any single filter page
         }
-        else if ($sermonz_controller->active_search->page_number>1 &&
-            !($sermonz_controller->active_search->passage || $sermonz_controller->active_search->speaker || $sermonz_controller->active_search->keywords || $sermonz_controller->active_search->page_size!=10)
-        )
+        else if ($sermonz_controller->active_search->page>1 && !$keyword_search_active)
         {
-            echo sprintf('%s<link rel="canonical" href="%s%s" />%s', "\n", $link, $sermonz_controller->active_search->page_number, "\n");
+            echo sprintf('%s<link rel="canonical" href="%s%s" />%s', "\n", $link, $sermonz_controller->active_search->page, "\n");
         }
         else 
         {

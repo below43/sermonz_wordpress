@@ -52,7 +52,6 @@ class SermonzViewFilter
 
     private function _load_filter_body()
     {
-        
         switch ($this->_filter)
         {
             case "series":
@@ -101,7 +100,7 @@ class SermonzViewFilter
         {
             $speaker_url = $this->_sermonz_controller->build_url(array(
                 "speaker"=>$speaker,
-                "page"=>1
+                "page_number"=>1
             ));
             $this->_content .= sprintf
             (
@@ -153,7 +152,7 @@ class SermonzViewFilter
                 {
                     $series_url = $this->_sermonz_controller->build_url(array(
                         "book"=>$book,
-                        "page"=>1
+                        "page_number"=>1
                     ));
                     
                     $this->_content .= sprintf
@@ -257,7 +256,7 @@ class SermonzViewFilter
             $more = sprintf('%s/filter/series/?page_number=%s', $base_url, $page_number);
             $this->_content .= sprintf('<a href="%s" class="sermonz_previous">Load Previous</a>', $more);
         }
-        if ($series->row_count > ($series->page_number*$series->page_size))
+        if ($series->row_count > ($series->page*$series->page_size))
         {
             $page_number = $series->page_number+1;
             $more = sprintf('%s/filter/series/?page_number=%s', $base_url, $page_number);
