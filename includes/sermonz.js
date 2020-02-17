@@ -22,6 +22,11 @@ jQuery(function()
         jQuery('.sermonz_form .keywords').val('');
         jQuery('.sermonz_form').submit();
     });
+    jQuery(".sermonz_share_link a").click(function() {
+        text = window.location.href;
+        window.prompt( "Copy this URL, then share to email/TXT/Facebook etc.", text );
+        return false;
+    })
 });
 
 function sermonzSubmitForm()
@@ -58,4 +63,20 @@ function initialiseMoreLinks()
         
         return false;
     });
+}
+function shareUrl()
+{
+}
+function copyUrl()
+{
+    var dummy = document.createElement('input'),
+    text = window.location.href;
+
+    document.body.appendChild(dummy);
+    dummy.value = text;
+    dummy.select();
+    document.execCommand('copy');
+    document.body.removeChild(dummy);
+
+    alert("")
 }

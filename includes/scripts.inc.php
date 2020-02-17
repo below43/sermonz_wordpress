@@ -17,13 +17,17 @@ add_action('wp_enqueue_scripts', 'sermonz_enqueue_scripts');
 function sermonz_enqueue_scripts() {
     wp_register_style( 
         'sermonz', 
-        plugins_url('/sermonz.css', __FILE__) 
+        plugins_url('/sermonz.css', __FILE__), 
+        null,
+        1.1
     );
     wp_enqueue_style( 'sermonz' );
     wp_enqueue_script( 
         'sermonz', 
         plugins_url('/sermonz.js', __FILE__),
-        array( 'jquery' ) 
+        array( 'jquery' ),
+        1.1,
+        true
     );
 }
  

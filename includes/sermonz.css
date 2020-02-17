@@ -262,11 +262,19 @@
     /* margin-right: 2%;
     float: left; */
 }
-.entry-content .sermonz_back_link {
+.sermonz_sermon_action_links {
     margin-top: 40px;
+}
+.entry-content .sermonz_back_link{
+    opacity: 0.5;
+    float:left;
+}
+.entry-content .sermonz_share_link {
+    float:right;
     opacity: 0.5;
 }
 
+.page .site-content .entry-title span.colon { display:none; }
 
 @media screen and (max-width: 375px) {
 
@@ -278,5 +286,13 @@
     .entry-content .sermonz_series_row:nth-child(odd),
     .entry-content .sermonz_sermon_row:nth-child(odd) {
         margin-right: 0%;
+    }
+    .entry-content .sermonz_sermon_series_thumb {
+        float: none;
+        width: 100%; 
+        margin-bottom: 20px;
+    }
+    .sermonz_share_link {
+        display:none;
     }
 }

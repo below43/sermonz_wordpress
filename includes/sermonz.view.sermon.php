@@ -52,13 +52,20 @@ class SermonzViewSermon
         $base_url = $this->_sermonz_controller->build_url(array("page_number"=>1));
         $url_base = get_site_url().$this->_sermonz_controller->base_url;
         $back = (strpos(wp_get_referer(), $url_base)!==false)?'Back to':'Browse'; //dashicons-arrow-left-alt2":"dashicons-screenoptions";
+        $sermonz_header_link .= '<div class="sermonz_sermon_action_links">';
         $sermonz_header_link .= sprintf(
             '<div class="sermonz_back_link"><a href="%s"><span class="dashicons-before dashicons-arrow-left-alt2"></span> &nbsp;%s %s</a></div>',
             $base_url,
             $back,
             'sermon library'
         ); 
-        
+        $current_url="https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+        $sermonz_header_link .= sprintf(
+            '<div class="sermonz_share_link"><a href="%s"><span class="dashicons dashicons-external"></span> &nbsp;%s</a></div>',
+            $current_url,
+            'Share this talk'
+        ); 
+        $sermonz_header_link .= '</div>';
 
 
         $this->_title = sprintf("%s | %s",

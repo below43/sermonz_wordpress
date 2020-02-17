@@ -44,7 +44,7 @@ function sermonz_filter_h1_title( $title, $id )
         global $sermonz_controller;
         if (isset($sermonz_controller->title) && $sermonz_controller->title)
         { 
-            return sprintf("%s<br/><small>%s</small>", $title, $sermonz_controller->title);
+            return sprintf("%s<span class=\"colon\">:</span> <br/><small>%s</small>", $title, $sermonz_controller->title);
         }
     }
     return $title;
