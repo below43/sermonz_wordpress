@@ -2,7 +2,6 @@
 
 add_filter('document_title_parts', 'sermonz_filter_head_title');
 
-
 add_action( 'loop_start', 'set_custom_content_filters' );
 function set_custom_content_filters() 
 {

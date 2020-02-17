@@ -5,7 +5,8 @@ add_filter( 'query_vars', 'sermonz_insert_query_vars' );
 add_action( 'wp_loaded', 'sermonz_flush_rules' ); 
 
 // flush_rules() if our rules are not yet included
-function sermonz_flush_rules() {
+function sermonz_flush_rules() 
+{
     $rules = get_option( 'rewrite_rules' );
 	$rule_regexp = sermonz_rule_regexp();
 	if (!isset($rules[$rule_regexp] ) ) {
@@ -27,7 +28,8 @@ function sermonz_rule_regexp()
 }
 
 // Adding a new rule
-function sermonz_insert_rewrite_rules( $rules ) {
+function sermonz_insert_rewrite_rules( $rules ) 
+{
 	$newrules = array();
 	$rule_regexp = sermonz_rule_regexp();
 	$id = get_option('sermonz_page');

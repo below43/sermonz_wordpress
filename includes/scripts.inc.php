@@ -14,7 +14,8 @@ wp_enqueue_script( 'script', get_template_directory_uri() . '/js/script.js', arr
 */
 
 add_action('wp_enqueue_scripts', 'sermonz_enqueue_scripts');
-function sermonz_enqueue_scripts() {
+function sermonz_enqueue_scripts() 
+{
     wp_register_style( 
         'sermonz', 
         plugins_url('/sermonz.css', __FILE__), 
@@ -31,7 +32,8 @@ function sermonz_enqueue_scripts() {
     );
 }
  
-function sermonz_load_dashicons(){
+function sermonz_load_dashicons()
+{
     wp_enqueue_style('dashicons');
 }
 add_action('wp_enqueue_scripts', 'sermonz_load_dashicons');

@@ -1,5 +1,3 @@
-
-
 jQuery(function() 
 {
     initialiseMoreLinks();
@@ -51,7 +49,6 @@ function initialiseMoreLinks()
     {
         jQuery(".sermonz_more_wrap").remove();
         var href=jQuery(this).attr("href");
-        //jQuery('.sermonz_series_list').load(href+' .sermonz_series_list');
         jQuery(".sermonz_loading").show();
         jQuery.get(href, function(data)
         {
@@ -63,20 +60,4 @@ function initialiseMoreLinks()
         
         return false;
     });
-}
-function shareUrl()
-{
-}
-function copyUrl()
-{
-    var dummy = document.createElement('input'),
-    text = window.location.href;
-
-    document.body.appendChild(dummy);
-    dummy.value = text;
-    dummy.select();
-    document.execCommand('copy');
-    document.body.removeChild(dummy);
-
-    alert("")
 }

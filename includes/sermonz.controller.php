@@ -5,14 +5,12 @@ require('sermonz.view.filter.php');
 require('sermonz.view.sermon.php');
 
 add_action('init', 'sermonz_start_session', 1);
-function sermonz_start_session() {
+function sermonz_start_session() 
+{
     if(!session_id()) {
         session_start();
     }
 }
-
-
-// add_action( 'pre_get_posts', 'sermonz_start' ); 
 
 function sermonz_start()
 {
