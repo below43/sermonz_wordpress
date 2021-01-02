@@ -29,14 +29,14 @@ jQuery(function()
 
 function sermonzSubmitForm()
 {
-    console.log("submitting form...");
+    // console.log("submitting form...");
     jQuery('.sermonz_form').submit(function(){
         jQuery.ajax({
           url: jQuery('.sermonz_form').attr('action'),
           type: 'POST',
           data : jQuery('.sermonz_form').serialize(),
           success: function(){
-            console.log('form submitted.');
+            // console.log('form submitted.');
           }
         });
         return false;
@@ -52,10 +52,13 @@ function initialiseMoreLinks()
         jQuery(".sermonz_loading").show();
         jQuery.get(href, function(data)
         {
-            jQuery(data).find(".sermonz_series_list").appendTo(".sermons_series_pages");
-            jQuery(".sermonz_previous").remove();
+            if (jQuery(data).find(".sermonz_series_row").length>0 ||
+            jQuery(data).find(".sermonz_sermon_row").length>0) {
+                jQuery(data).find(".sermonz_series_list").appendTo(".sermons_series_pages");
+                jQuery(".sermonz_previous").remove();
+                initialiseMoreLinks();
+            }
             jQuery(".sermonz_loading").hide();
-            initialiseMoreLinks();
         });
         
         return false;

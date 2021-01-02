@@ -72,8 +72,8 @@ class SermonzViewFilter
     private function _load_speakers()
     {
         $params = [
-            order_by => get_query_var('order_by'),
-            order_direction => get_query_var('order_direction')
+            'order_by' => get_query_var('order_by'),
+            'order_direction' => get_query_var('order_direction')
         ];
 
         $url = "/speakers/";
@@ -89,7 +89,7 @@ class SermonzViewFilter
         $speakers = json_decode($result);
 
         if ($this->debug) $this->_content .= sprintf('<br/><pre>%s</pre>', $speakers);
-        if (!$speakers || !count($speakers)) {
+        if (!$speakers || !@count($speakers)) {
             $this->_content .= sprintf('<p>No speakers found</p>');
             return;
         }
@@ -98,8 +98,10 @@ class SermonzViewFilter
         $this->_content .= '<div class="sermonz_filter_list"><br/>';
         foreach ($speakers as $speaker) 
         {
+            if (!$speaker) continue;
             $speaker_url = $this->_sermonz_controller->build_url(array(
-                "speaker"=>$speaker,
+                "speaker_id"=>$speaker->id,
+                "speaker_name"=>$speaker->name,
                 "page_number"=>1
             ));
             $this->_content .= sprintf
@@ -108,8 +110,8 @@ class SermonzViewFilter
                     <p class="sermonz_filter_name"><b><a href="%s" class="sermonz_filter_href %s">%s</a></b></p>
                 </div>',
                 $speaker_url,
-                $speaker==$this->_active_search->speaker?" active":"",
-                esc_html($speaker)
+                ($speaker->id==$this->_active_search->speaker_id)?" active":"",
+                esc_html($speaker->name)
             );        
         }
         $this->_content .= '</div>';
@@ -144,7 +146,7 @@ class SermonzViewFilter
         $this->_content .= '<div class="sermonz_filter_list">';
         foreach ($this->_sermonz_controller->testaments as $testament=>$testament_books) 
         {
-            $this->_content.=sprintf('<h5>%s</h5>', $testament);
+            $this->_content.=sprintf('<h3 style="clear:left">%s</h3>', $testament);
             
             foreach ($testament_books as $book) 
             {
@@ -188,7 +190,7 @@ class SermonzViewFilter
         $params = [
             order_by => get_query_var('order_by'),
             order_direction => get_query_var('order_direction'),
-            page_size => '100',
+            page_size => '12',
             page_number => $page_number
         ];
 
@@ -208,7 +210,7 @@ class SermonzViewFilter
         }
 
         $this->title = "Series";
-        $this->_content .= '<div class="sermonz_series_list">';
+        $this->_content .= '<div class="sermons_series_pages"><div class="sermonz_series_list">';
         foreach ($series->series as $series_item) 
         {
             $series_url = $this->_sermonz_controller->build_url
@@ -263,6 +265,6 @@ class SermonzViewFilter
             $this->_content .= sprintf('<a href="%s" class="sermonz_more">Load More</a>', $more);
         }
         $this->_content .= '</div>';
-        $this->_content .= '</div>';
+        $this->_content .= '</div></div><div style="clear:left;display:none" class="sermonz_loading" ><center>Loading...</center></div>'; 
     }
 }

@@ -5,6 +5,7 @@ require('sermonz.view.filter.php');
 require('sermonz.view.sermon.php');
 
 add_action('init', 'sermonz_start_session', 1);
+
 function sermonz_start_session() 
 {
     if(!session_id()) {
@@ -16,6 +17,7 @@ function sermonz_start()
 {
     if (get_the_ID() == get_option('sermonz_page')) 
     {
+        session_start();
         global $sermonz_controller;
         $sermonz_api_url = get_option('sermonz_api_url');
         $base_url = sermonz_get_page_uri();
@@ -45,7 +47,7 @@ class SermonzController
         ),
         "New Testament" => array
         (
-            'Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrew','James','1 Peter','2 Peter','1 John','2 John','3 John','Jude','Revelation'
+            'Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','Jude','Revelation'
         )
     );
 
@@ -71,7 +73,7 @@ class SermonzController
             case "filter":
                 $this->_load_filter($this->argument);
                 break;
-            case "sermon":
+            case "talk":
                 $this->_load_sermon($this->argument);
                 break;
             default:
@@ -98,9 +100,11 @@ class SermonzController
         if ($keywords = get_query_var('keywords')) {
             $search->keywords = $keywords;
         }
-        if ($speaker =  get_query_var('speaker')) {
-            $search->speaker = $speaker;
-            $this->title = sprintf("Talks by %s",  $speaker);
+        if ($speaker_id =  get_query_var('speaker_id')) {
+            $search->speaker_id = $speaker_id;
+            $speakers = $this->_load_speakers_item($search->speaker_id);            
+            $this->speaker_name = $search->speaker_name = $speakers->name;
+            $this->title = sprintf("Talks by %s",  $this->speaker_name);
         }
         if ($book =  get_query_var('book')) {
             $search->book = 
@@ -128,7 +132,7 @@ class SermonzController
             }
             else 
             {
-                $search->page_size = 10;
+                $search->page_size = 12;
             }
         }
 
@@ -174,6 +178,23 @@ class SermonzController
         return $series;
     }
 
+    private function _load_speakers_item($id)
+    {
+        $url = "/speakers/".(int)$id;
+        $result = $this->call_api($url);
+        if ($result instanceof SermonzError) 
+        {
+            $this->content .= sprintf('<p class="error">%s</p>', $result->error);
+            return;
+        }
+        $speaker = json_decode($result);
+        if (!$speaker) {
+            $this->content .= sprintf('<p class="error">Error: cannot load speaker with id, %s</p>', (int)$id);
+            return;
+        } 
+        return $speaker;
+    }
+
     public function call_api($endpoint, $data = array())
     {
         if (!function_exists('curl_version'))
@@ -215,11 +236,11 @@ class SermonzController
         
         $url = sprintf
         (
-            '%s?keywords=%s&series_id=%s&speaker=%s&book=%s&page_number=%s&page_size=%s',
+            '%s?keywords=%s&series_id=%s&speaker_id=%s&book=%s&page_number=%s&page_size=%s',
             $this->base_url,
             urlencode($tmp_search->keywords),
             urlencode($tmp_search->series_id>0?$tmp_search->series_id:null),
-            urlencode($tmp_search->speaker),
+            urlencode($tmp_search->speaker_id>0?$tmp_search->speaker_id:null),
             urlencode
             (
                 (
@@ -229,7 +250,7 @@ class SermonzController
                 ?$tmp_search->book:null
             ),
             (int)$tmp_search->page_number>0?(int)$tmp_search->page_number:1,
-            (int)$tmp_search->page_size>0&&(int)$tmp_search->page_size<100?(int)$tmp_search->page_size:10
+            (int)$tmp_search->page_size>0&&(int)$tmp_search->page_size<100?(int)$tmp_search->page_size:12
         );
         return $url;
     }
@@ -244,8 +265,8 @@ class SermonzController
                 return $this->build_url(array("page_number"=>1, "series_id"=>null));
                 break;
             case "speakers":
-                if (!$this->active_search->speaker) return false;
-                return $this->build_url(array("page_number"=>1, "speaker"=>""));
+                if (!$this->active_search->speaker_id) return false;
+                return $this->build_url(array("page_number"=>1, "speaker_id"=>""));
                 break;
             case "books":
                 if (!$this->active_search->book) return false;
@@ -261,16 +282,16 @@ class SermonzController
         switch ($argument)
         {
             case "series":
-                return $this->build_url(array("page_number"=>1, "series_id"=>$filter_value, "speaker"=>"", "book"=>""));
+                return $this->build_url(array("page_number"=>1, "series_id"=>$filter_value, "speaker_id"=>"", "book"=>""));
                 break;
             case "speakers":
-                return $this->build_url(array("page_number"=>1, "series_id"=>"", "speaker"=>$filter_value, "book"=>""));
+                return $this->build_url(array("page_number"=>1, "series_id"=>"", "speaker_id"=>$filter_value, "book"=>""));
                 break;
             case "books":
-                return $this->build_url(array("page_number"=>1, "series_id"=>"", "speaker"=>"", "book"=>$filter_value));
+                return $this->build_url(array("page_number"=>1, "series_id"=>"", "speaker_id"=>"", "book"=>$filter_value));
                 break;
             case "keywords":
-                return $this->build_url(array("page_number"=>1, "series_id"=>"", "speaker"=>"", "book"=>""));
+                return $this->build_url(array("page_number"=>1, "series_id"=>"", "speaker_id"=>"", "book"=>""));
                 break;
         }
         return false;
@@ -296,8 +317,8 @@ class SermonzSearch
     }
     public $keywords="";
     public $series_id=null;
-    public $speaker="";
+    public $speaker_id="";
     public $book="";
     public $page_number=1;
-    public $page_size=10;
+    public $page_size=12;
 }

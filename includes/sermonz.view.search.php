@@ -26,8 +26,8 @@ class SermonzViewSearch
         $sermonz_content .= sprintf('<form action="%s" method="GET" class="sermonz_form">', $this->_sermonz_controller->base_url);
         $keyword_search_active = (isset($this->_active_search->keywords) && $this->_active_search->keywords)?"active":"";
         $sermonz_content .= sprintf(
-            '<input type="hidden" name="speaker" value="%s" />',
-            $this->_active_search->speaker
+            '<input type="hidden" name="speaker_id" value="%s" />',
+            $this->_active_search->speaker_id
         );
         $sermonz_content .= sprintf(
             '<input type="hidden" name="series_id" value="%s" />',
@@ -41,8 +41,8 @@ class SermonzViewSearch
             '<div class="sermonz_search_field_wrap %s"><label><span class="screen-reader-text">%s</span><input type="search" class="keywords" placeholder="%s" name="keywords" title="%s" value="%s" /></label>
             <a style="cursor:pointer" class="sermonz_clear_search"><span class="dashicons dashicons-no-alt"></span><span class="screen-reader-text">Clear Search</span></a></div>', 
             $keyword_search_active,
-            esc_attr_x('Search sermon library', 'sermon search text box'),
-            esc_attr_x('Search sermons', 'sermon search text box'),
+            esc_attr_x('Search talks library', 'sermon search text box'),
+            esc_attr_x('Search talks', 'sermon search text box'),
             esc_attr_x('Search', 'sermon search text box'),
             esc_attr($this->_active_search->keywords)
         );
@@ -79,11 +79,11 @@ class SermonzViewSearch
                     }
                     break;
                 case "Speaker":
-                    if (isset($this->_active_search->speaker)&&$this->_active_search->speaker)
+                    if (isset($this->_active_search->speaker_id)&&isset($this->_active_search->speaker_name)&&$this->_active_search->speaker_name)
                     {
                         $classes.="active "; 
                         $active = true;
-                        $filter_val = $this->_active_search->speaker;
+                        $filter_val = $this->_active_search->speaker_name;
                     }
                     break;
             }
@@ -116,8 +116,8 @@ class SermonzViewSearch
     {
         $tmp_search = clone $this->_active_search;
         $params = [
-            order_by => get_query_var('order_by'),
-            order_direction => get_query_var('order_direction')
+            'order_by' => get_query_var('order_by'),
+            'order_direction' => get_query_var('order_direction')
         ];
 
         $url = "/sermons";
@@ -132,9 +132,9 @@ class SermonzViewSearch
         {
             $parameters["series_id"]=$tmp_search->series_id;
         }
-        if ($this->_active_search->speaker) 
+        if ($this->_active_search->speaker_id) 
         {
-            $parameters["speaker"]=$tmp_search->speaker;
+            $parameters["speaker_id"]=$tmp_search->speaker_id;
         }
         if ($this->_active_search->book) 
         {
@@ -142,7 +142,7 @@ class SermonzViewSearch
         }
 
         $parameters["page_number"]=(int)$tmp_search->page_number?(int)$tmp_search->page_number:1;
-        $parameters["page_size"]=(int)$tmp_search->page_size>0?(int)$tmp_search->page_size:10;
+        $parameters["page_size"]=(int)$tmp_search->page_size>0?(int)$tmp_search->page_size:12;
  
         $result = $this->_sermonz_controller->call_api($url, $parameters);
         if ($result instanceof SermonzError)
@@ -152,12 +152,12 @@ class SermonzViewSearch
         }
 
         $sermons = json_decode($result);
-        if (!$sermons || !count($sermons)) {
-            $this->_content .= sprintf('<p>No sermons found</p>');
+        if (!$sermons || !@count($sermons)) {
+            $this->_content .= sprintf('<p>No talks found</p>');
             return;
         }
         
-        $this->_content .= sprintf('<p class="sermonz_row_count">%s sermon%s</p>', $sermons->row_count, $sermons->row_count!=1?"s":"");
+        $this->_content .= sprintf('<p class="sermonz_row_count">%s talk%s</p>', $sermons->row_count, $sermons->row_count!=1?"s":"");
 
         if ($sermons->page_number>1)
         {
@@ -169,7 +169,7 @@ class SermonzViewSearch
         foreach ($sermons->sermons as $sermon) 
         {
             $sermon_url = sprintf(
-                '%s/sermon/%s',
+                '%s/talk/%s',
                 $this->_sermonz_controller->base_url,
                 $sermon->sermon_id
             );
@@ -193,7 +193,7 @@ class SermonzViewSearch
                 $sermon_url,
                 esc_html($sermon->series_name),
                 $sermon_url,
-                esc_html($sermon->speaker),
+                esc_html($sermon->speaker_name),
                 $sermon_url,
                 esc_html($date),
                 esc_html($sermon->passage)
@@ -208,7 +208,7 @@ class SermonzViewSearch
             $this->_content .= sprintf('<a href="%s" class="sermonz_more">Load More</a>', $more);
         }
         $this->_content .= '</div>'; 
-        $this->_content .= '</div></div><div class="sermonz_loading" style="display:none"><center><small>Loading...</small></center></div>'; 
+        $this->_content .= '</div></div><div class="sermonz_loading" style="display:none"><center>Loading...</center></div>'; 
 
     }
 

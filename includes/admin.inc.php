@@ -135,22 +135,6 @@ function sermonz_options_page_html()
 	<?php
 }
 
-function sermonz_shortcode($atts = [], $content = null, $tag = '')
-{
-
-    $o = '<div class="wporg-box">Coming soon...</div>';
- 
-    // return output
-    return $o;
-}
- 
-function sermonz_shortcodes_init()
-{
-    add_shortcode('sermonz', 'sermonz_shortcode');
-}
- 
-add_action('init', 'sermonz_shortcodes_init');
-
 //todo - add rewrite rule for /listen/series, listen/books, listen/speakers, listen/series/id/series-name, listen/sermon/id/passage/preacher/sermon-title
 
 
