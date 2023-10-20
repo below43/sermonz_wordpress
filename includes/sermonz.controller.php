@@ -2,14 +2,12 @@
 
 require('sermonz.view.search.php');
 require('sermonz.view.filter.php');
-require('sermonz.view.sermon.php');
-
-add_action('init', 'sermonz_start_session', 1);
+require('sermonz.view.sermon.php'); 
 
 function sermonz_start_session() 
 {
     if(!session_id()) {
-        session_start();
+        @session_start();
     }
 }
 
@@ -17,7 +15,6 @@ function sermonz_start()
 {
     if (get_the_ID() == get_option('sermonz_page')) 
     {
-        session_start();
         global $sermonz_controller;
         $sermonz_api_url = get_option('sermonz_api_url');
         $base_url = sermonz_get_page_uri();
@@ -239,15 +236,15 @@ class SermonzController
             '%s?keywords=%s&series_id=%s&speaker_id=%s&book=%s&page_number=%s&page_size=%s',
             $this->base_url,
             urlencode($tmp_search->keywords),
-            urlencode($tmp_search->series_id>0?$tmp_search->series_id:null),
-            urlencode($tmp_search->speaker_id>0?$tmp_search->speaker_id:null),
+            urlencode($tmp_search->series_id>0?$tmp_search->series_id:''),
+            urlencode($tmp_search->speaker_id>0?$tmp_search->speaker_id:''),
             urlencode
             (
                 (
                     in_array($tmp_search->book, $this->testaments["Old Testament"]) ||
                     in_array($tmp_search->book, $this->testaments["New Testament"])
                 )
-                ?$tmp_search->book:null
+                ?$tmp_search->book:''
             ),
             (int)$tmp_search->page_number>0?(int)$tmp_search->page_number:1,
             (int)$tmp_search->page_size>0&&(int)$tmp_search->page_size<100?(int)$tmp_search->page_size:12

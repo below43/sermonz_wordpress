@@ -14,7 +14,7 @@ include('includes/admin.inc.php');
 include('includes/scripts.inc.php');
 
 //configure routing
-include('includes/routes.inc.php');
+include_once('includes/routes.inc.php');
 
 //fetch the sermonz content 
 include('includes/sermonz.controller.php');

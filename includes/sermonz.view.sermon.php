@@ -56,7 +56,7 @@ class SermonzViewSermon
         $base_url = $this->_sermonz_controller->build_url();
         $url_base = get_site_url().$this->_sermonz_controller->base_url;
         $back = (strpos(wp_get_referer(), $url_base)!==false)?'Back to':'Browse'; //dashicons-arrow-left-alt2":"dashicons-screenoptions";
-        $sermonz_header_link .= '<div class="sermonz_sermon_action_links">';
+        $sermonz_header_link = '<div class="sermonz_sermon_action_links">';
         $sermonz_header_link .= sprintf(
             '<div class="sermonz_back_link"><a href="%s"><span class="dashicons-before dashicons-arrow-left-alt2"></span> &nbsp;%s %s</a></div>',
             $base_url,
@@ -96,7 +96,7 @@ class SermonzViewSermon
         $date = date_format(date_create($sermon->sermon_date), "d F Y");
         
         $passage_parts = explode(" ", $sermon->passage);
-        
+        $passage = '';
         if (in_array($passage_parts[0], $this->_sermonz_controller->testaments["Old Testament"])||
             in_array($passage_parts[0], $this->_sermonz_controller->testaments["New Testament"])) 
         {
@@ -134,7 +134,7 @@ class SermonzViewSermon
         );
         
         $players = "";
-        if ($sermon->sermon_video_embed_code) {
+        if (isset($sermon->sermon_video_embed_code) && $sermon->sermon_video_embed_code) {
             $players .= sprintf
             (
                 '<h3>Video</h3>

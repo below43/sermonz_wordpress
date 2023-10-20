@@ -150,9 +150,9 @@ class SermonzViewSearch
             $this->_content .= sprintf('<p class="error">%s</p>', $result->error);
             return;
         }
-
+		
         $sermons = json_decode($result);
-        if (!$sermons || !@count($sermons)) {
+        if (!$sermons || !is_countable($sermons->sermons)) {
             $this->_content .= sprintf('<p>No talks found</p>');
             return;
         }

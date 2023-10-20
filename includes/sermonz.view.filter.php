@@ -30,7 +30,7 @@ class SermonzViewFilter
     private function _load_filter_head()
     {
         $base_url = $this->_sermonz_controller->build_url(array("page"=>1));
-        $sermonz_content .= '<div class="sermonz_filter_inner_head_wrap">';
+        $sermonz_content = '<div class="sermonz_filter_inner_head_wrap">';
         $sermonz_content .= sprintf(
             '<div class="sermonz_filter_inner_head"><a href="%s">%s</a></div>',
             $base_url,
@@ -84,17 +84,17 @@ class SermonzViewFilter
             $this->_content .= sprintf('<p class="error">%s</p>', $result->error);
             return;
         }
-        if ($this->debug) $this->_content .= sprintf('<br/><pre>result: %s</pre>', $result);
+        if ($this->_sermonz_controller->debug) $this->_content .= sprintf('<br/><pre>result: %s</pre>', $result);
 
         $speakers = json_decode($result);
 
-        if ($this->debug) $this->_content .= sprintf('<br/><pre>%s</pre>', $speakers);
+        if ($this->_sermonz_controller->debug) $this->_content .= sprintf('<br/><pre>%s</pre>', $speakers);
         if (!$speakers || !@count($speakers)) {
             $this->_content .= sprintf('<p>No speakers found</p>');
             return;
         }
 
-        $this->title = "Speakers";
+        $this->_title = "Speakers";
         $this->_content .= '<div class="sermonz_filter_list"><br/>';
         foreach ($speakers as $speaker) 
         {
@@ -120,8 +120,8 @@ class SermonzViewFilter
     private function _load_books()
     {
         $params = [
-            order_by => get_query_var('order_by'),
-            order_direction => get_query_var('order_direction')
+            'order_by' => get_query_var('order_by'),
+            'order_direction' => get_query_var('order_direction')
         ];
 
         $url = "/books/";
@@ -132,17 +132,17 @@ class SermonzViewFilter
             $this->_content .= sprintf('<p class="error">%s</p>', $result->error);
             return;
         }
-        if ($this->debug) $this->_content .= sprintf('<br/><pre>result: %s</pre>', $result);
+        if ($this->_sermonz_controller->debug) $this->_content .= sprintf('<br/><pre>result: %s</pre>', $result);
 
         $books = json_decode($result);
 
-        if ($this->debug) $this->_content .= sprintf('<br/><pre>%s</pre>', $books);
+        if ($this->_sermonz_controller->debug) $this->_content .= sprintf('<br/><pre>%s</pre>', $books);
         if (!$books || !count($books)) {
             $this->_content .= sprintf('<p>No books found</p>');
             return;
         }
 
-        $this->title = "Books";
+        $this->_title = "Books";
         $this->_content .= '<div class="sermonz_filter_list">';
         foreach ($this->_sermonz_controller->testaments as $testament=>$testament_books) 
         {
@@ -188,10 +188,10 @@ class SermonzViewFilter
         $page_number = get_query_var('page_number');
         if (!$page_number||$page_number<1) $page_number = 1;
         $params = [
-            order_by => get_query_var('order_by'),
-            order_direction => get_query_var('order_direction'),
-            page_size => '12',
-            page_number => $page_number
+            'order_by' => get_query_var('order_by'),
+            'order_direction' => get_query_var('order_direction'),
+            'page_size' => '12',
+            'page_number' => $page_number
         ];
 
         $url = "/series/";
@@ -204,12 +204,12 @@ class SermonzViewFilter
         }
 
         $series = json_decode($result);
-        if (!$series || !count($series)) {
+        if (!$series || !count($series->series)) {
             $this->_content .= sprintf('<p>No series found</p>');
             return;
         }
 
-        $this->title = "Series";
+        $this->_title = "Series";
         $this->_content .= '<div class="sermons_series_pages"><div class="sermonz_series_list">';
         foreach ($series->series as $series_item) 
         {
@@ -258,7 +258,7 @@ class SermonzViewFilter
             $more = sprintf('%s/filter/series/?page_number=%s', $base_url, $page_number);
             $this->_content .= sprintf('<a href="%s" class="sermonz_previous">Load Previous</a>', $more);
         }
-        if ($series->row_count > ($series->page*$series->page_size))
+        if ($series->row_count > ($series->page_number*$series->page_size))
         {
             $page_number = $series->page_number+1;
             $more = sprintf('%s/filter/series/?page_number=%s', $base_url, $page_number);
@@ -268,3 +268,4 @@ class SermonzViewFilter
         $this->_content .= '</div></div><div style="clear:left;display:none" class="sermonz_loading" ><center>Loading...</center></div>'; 
     }
 }
+

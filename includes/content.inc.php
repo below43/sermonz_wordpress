@@ -86,9 +86,10 @@ function sermonz_filter_header_subtitle()
 function sermonz_filter_content($content) 
 {
     global $sermonz_controller;
+	$sermonz_content = '';
 	if (get_the_ID() == get_option('sermonz_page')) 
 	{
-    	$sermonz_content = '<div class="sermonz">';
+    	$sermonz_content .= '<div class="sermonz">';
         $sermonz_content.=$sermonz_controller->content;
         $sermonz_content .= '<style src="/wp-includes/plugins/sermonz/sermonz.css"></style>';
         $sermonz_content .= sprintf('<style>%s</style>', esc_html( get_option('sermonz_css') ));	
@@ -130,7 +131,7 @@ function new_rel_canonical() {
         {
             //no canonical for any single filter page
         }
-        else if ($sermonz_controller->active_search->page>1 && !$keyword_search_active)
+        else if (isset($sermonz_controller->active_search) && isset($sermonz_controller->active_search->page) && $sermonz_controller->active_search->page>1 && !$keyword_search_active)
         {
             echo sprintf('%s<link rel="canonical" href="%s%s" />%s', "\n", $link, $sermonz_controller->active_search->page, "\n");
         }
