@@ -270,11 +270,11 @@
     clear: left;
 }
 
-.sermonz_sermon_series_thumb {
+/* .sermonz_sermon_series_thumb {
     float: right;
     width: 44%;
     margin: 0.5em 0 0 0;
-}
+} */
 
 .sermonz_sermon_page {}
 
@@ -305,7 +305,7 @@
 }
 
 .sermonz_sermon_page img {
-    width: 100%;
+    width: 180px;
     /* margin-right: 2%;
     float: left; */
 }
@@ -353,6 +353,9 @@
     border: 1px solid darkgray;
     color: darkgray;
     margin: 0 auto;
+}
+.sermonz_sermon_player {
+    max-width: 640px;
 }
 .sermonz_sermon_player figure.wp-block-audio {
     margin-inline-start: 0;

@@ -42,8 +42,9 @@ class SermonzViewSermon
             return;
         }
         $sermon = json_decode($result);
+        
         if (!$sermon) {
-            global $wp_query;
+            global $wp_query;  
             $wp_query->set_404();
             status_header( 404 );
             $this->_content .= sprintf('<p>No talk found</p>'.$result);
@@ -63,11 +64,14 @@ class SermonzViewSermon
             'talks library'
         ); 
         $current_url="https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-        $sermonz_header_link .= sprintf(
-            '<div class="sermonz_download_link"><a href="%s"><span class="dashicons dashicons-download"></span> &nbsp;%s</a></div>',
-            esc_attr($sermon->sermon_file), 
-            'Download this talk'
-        ); 
+        
+        if ($sermon->sermon_file) {
+            $sermonz_header_link .= sprintf(
+                '<div class="sermonz_download_link"><a href="%s"><span class="dashicons dashicons-download"></span> &nbsp;%s</a></div>',
+                esc_attr($sermon->sermon_file), 
+                'Download this talk'
+            ); 
+        }
         $sermonz_header_link .= sprintf(
             '<div class="sermonz_share_link"><a href="%s"><span class="dashicons dashicons-share-alt2"></span> &nbsp;%s</a></div>',
             $current_url,
@@ -103,36 +107,59 @@ class SermonzViewSermon
         }
 
         $this->_content .= str_replace("sermonz_sermon_action_links", "sermonz_sermon_action_links top",$sermonz_header_link);
+
+
         $this->_content .= sprintf
         (
             '<div class="sermonz_sermon_page">
                 <h2 class="sermonz_metadata sermonz_metadata_title">%s</h2>
-                <div class="sermonz_sermon_series_thumb"><img src="%s" border="0" alt="%s" /></div>
                 <div class="sermonz_metadata_wrap">
                     <p class="sermonz_metadata sermonz_metadata_date"><span class="label">Date</span> %s</p>
                     <p class="sermonz_metadata sermonz_metadata_passage"><span class="label">Passage</span> %s</p>
                     <p class="sermonz_metadata sermonz_metadata_speaker"><span class="label">Speaker</span> <a href="%s">%s &nbsp;<span class="dashicons dashicons-screenoptions"></span></a></p>
                     <p class="sermonz_metadata sermonz_metadata_series"><span class="label">Series</span> <a href="%s">%s &nbsp;<span class="dashicons dashicons-screenoptions"></span></a></p>
+                    <div class="sermonz_sermon_series_thumb"><a href="%s"><img src="%s" border="0" alt="%s" /></a></div>
                 </div>
             </div>',
             esc_html($sermon->sermon_title),
-            esc_attr($sermon->series_image),
-            esc_html($sermon->series_name),
             esc_html($date),
             $passage,
             $speaker_url,
             esc_html($sermon->speaker_name),
             $series_url,
+            esc_html($sermon->series_name),
+            $series_url,
+            esc_attr($sermon->series_image),
             esc_html($sermon->series_name)
         );
+        
+        $players = "";
+        if ($sermon->sermon_video_embed_code) {
+            $players .= sprintf
+            (
+                '<h3>Video</h3>
+                <div class="sermonz_sermon_player_video">
+                    %s
+                </div>',
+                $sermon->sermon_video_embed_code
+            );
+        }
+        if ($sermon->sermon_file) {
+            $players .= sprintf
+            (
+                '<h3>Audio</h3>
+                <div class="sermonz_sermon_player">
+                    <figure class="wp-block-audio"><audio controls="" src="%s" preload="metadata"></audio></figure>
+                </div>',
+                esc_attr($sermon->sermon_file)
+            );
+        }
         $this->_content .= sprintf
         (
-            '<div class="sermonz_sermon_player">
-                <figure class="wp-block-audio"><audio controls="" src="%s" preload="metadata"></audio></figure>
-            </div>',
-            esc_attr($sermon->sermon_file)
+            '<div class="sermonz_players">%s</div>',
+            $players
         );
-       
+        
         $this->_content .= str_replace("sermonz_sermon_action_links", "sermonz_sermon_action_links bottom",$sermonz_header_link); 
     }
 }

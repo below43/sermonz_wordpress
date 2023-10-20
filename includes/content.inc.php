@@ -40,10 +40,10 @@ function sermonz_filter_head_title($title="")
 	}
 }
 
-function sermonz_filter_wpseo_title($title) 
+function sermonz_filter_wpseo_title($title)
 {
     if (get_the_ID() == get_option('sermonz_page')) {
-        global $sermonz_controller;
+        global $sermonz_controller; 
         if (!$sermonz_controller) {
             sermonz_start();
             remove_action( 'wpseo_head', 'rel_canonical' );
@@ -65,10 +65,9 @@ function sermonz_filter_h1_title( $title, $id )
     global $sermonz_controller;
     if ($id == get_option('sermonz_page') && (get_the_ID() == get_option('sermonz_page')))
     {
-
-        if (isset($sermonz_controller->title) && $sermonz_controller->title!=null && $sermonz_controller->title!=""); // && $sermonz_controller->title)
-        { 
-            return sprintf("%s: %s", $title, $sermonz_controller->title);
+        if (isset($sermonz_controller->title) && trim($sermonz_controller->title)!=null && trim($sermonz_controller->title)!="" && $sermonz_controller->title)
+        {
+            return $sermonz_controller->title;
         }
     }
     return $title;
